@@ -13,25 +13,18 @@ provider "libvirt" {
   uri = "qemu:///system"
 }
 
-resource "libvirt_pool" "ubuntu" {
-  name = "ubuntu"
+resource "libvirt_pool" "nixos" {
+  name = "nixos"
   type = "dir"
-  path = "/tmp/terraform-provider-libvirt-pool-ubuntu"
+  path = "/tmp/terraform-provider-libvirt-pool-nixos"
 }
 
-resource "libvirt_volume" "os_image" {
-  name = "arch-os_image"
-  pool = libvirt_pool.ubuntu.name
-  source = "/home/naman/Documents/Github/arch-cloud-image/output-archlinux/golden-arch.qcow2"
-  format = "qcow2"
-}
-
-# We fetch the latest ubuntu release image from their mirrors
+# We fetch the 22.05 nixos release image from their mirrors
 resource "libvirt_volume" "arch-qcow2" {
   name   = "arch-qcow2"
-  pool   = libvirt_pool.ubuntu.name
-  base_volume_id = libvirt_volume.os_image.id
-  size   = 100 * 1073741824
+  pool   = libvirt_pool.nixos.name
+  source = "https://channels.nixos.org/nixos-22.05/latest-nixos-minimal-x86_64-linux.iso"
+  format = "qcow2"
 }
 
 data "template_file" "user_data" {
@@ -45,12 +38,12 @@ data "template_file" "user_data" {
 resource "libvirt_cloudinit_disk" "commoninit" {
   name      = "commoninit.iso"
   user_data = data.template_file.user_data.rendered
-  pool      = libvirt_pool.ubuntu.name
+  pool      = libvirt_pool.nixos.name
 }
 
 # Create the machine
-resource "libvirt_domain" "domain-ubuntu" {
-  name   = "ubuntu-terraform"
+resource "libvirt_domain" "domain-nixos" {
+  name   = "nixos-terraform"
   memory = "4096"
   vcpu   = 2
   cloudinit = libvirt_cloudinit_disk.commoninit.id
