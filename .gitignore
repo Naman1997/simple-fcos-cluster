@@ -8,3 +8,4 @@ crash.log
 .terraform.lock.hcl
 ansible/
 Footer
+*.qcow2
