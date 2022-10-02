@@ -1,0 +1,10 @@
+
+*.tfvars
+*.tfplan
+*.tfstate
+*.tfstate.backup
+crash.log
+.terraform/
+.terraform.lock.hcl
+ansible/
+Footer
