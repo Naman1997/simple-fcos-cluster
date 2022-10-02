@@ -20,11 +20,11 @@ resource "libvirt_pool" "nixos" {
 }
 
 # We fetch the 22.05 nixos release image from their mirrors
-resource "libvirt_volume" "arch-qcow2" {
-  name   = "arch-qcow2"
+resource "libvirt_volume" "nixos-iso" {
+  name   = "nixos-iso"
   pool   = libvirt_pool.nixos.name
   source = "https://channels.nixos.org/nixos-22.05/latest-nixos-minimal-x86_64-linux.iso"
-  format = "qcow2"
+  # size   = 5361393152
 }
 
 data "template_file" "user_data" {
@@ -43,9 +43,9 @@ resource "libvirt_cloudinit_disk" "commoninit" {
 
 # Create the machine
 resource "libvirt_domain" "domain-nixos" {
-  name   = "nixos-terraform"
-  memory = "4096"
-  vcpu   = 2
+  name      = "nixos-terraform"
+  memory    = "4096"
+  vcpu      = 2
   cloudinit = libvirt_cloudinit_disk.commoninit.id
 
   cpu {
@@ -72,7 +72,7 @@ resource "libvirt_domain" "domain-nixos" {
   }
 
   disk {
-    volume_id = libvirt_volume.arch-qcow2.id
+    volume_id = libvirt_volume.nixos-iso.id
   }
 
   graphics {
