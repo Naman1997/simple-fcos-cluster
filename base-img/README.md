@@ -3,8 +3,7 @@
 ## Creating the qcow2 image using docker
 
 ```
-sudo docker run -d -v "$(pwd)":/tmp nixos/nix:2.11.1 /bin/sh -c 'echo "system-features = kvm" > /etc/nix/nix.conf && nix-build "<nixpkgs/nixos>" -A config.system.build.qcow2 --arg configuration "{ imports = [ ./tmp/build-qcow2.nix ]; }" && mv ./result/nixos.qcow2 /tmp/nixos.qcow2'
-sudo chmod +rw nixos.qcow2
+sudo docker run -v "$(pwd)":/tmp nixos/nix:2.11.1 /bin/sh -c 'echo "system-features = kvm" > /etc/nix/nix.conf && nix-build "<nixpkgs/nixos>" -A config.system.build.qcow2 --arg configuration "{ imports = [ ./tmp/build-qcow2.nix ]; }" && mv ./result/nixos.qcow2 /tmp/nixos.qcow2' && sudo chmod +rw nixos.qcow2
 ```
 
 ## Using another VM or your own host
