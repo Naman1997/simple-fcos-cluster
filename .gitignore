@@ -9,3 +9,4 @@ crash.log
 ansible/
 Footer
 *.qcow2
+base-img/nix-build*

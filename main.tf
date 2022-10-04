@@ -23,8 +23,8 @@ resource "libvirt_pool" "nixos" {
 resource "libvirt_volume" "nixos-iso" {
   name   = "nixos-iso"
   pool   = libvirt_pool.nixos.name
-  source = "https://channels.nixos.org/nixos-22.05/latest-nixos-minimal-x86_64-linux.iso"
-  # size   = 5361393152
+  source = "./base-img/nixos.qcow2"
+  format = "qcow2"
 }
 
 data "template_file" "user_data" {
@@ -80,6 +80,43 @@ resource "libvirt_domain" "domain-nixos" {
     listen_type = "address"
     autoport    = true
   }
-}
 
-# IPs: use wait_for_lease true or after creation use terraform refresh and terraform show for the ips of domain
+  # connection {
+  #   type     = "ssh"
+  #   user     = "root"
+  #   password = ""
+  #   host     = network_interface.default.addresses.0
+  # }
+
+  # provisioner "file" {
+  #   source      = "./kubernetes/configuration.nix"
+  #   destination = "/etc/nixos/configuration.nix"
+
+  #   connection {
+  #     type        = "ssh"
+  #     user        = "root"
+  #     password = ""
+  #     host     = network_interface.default.addresses.0
+  #   }
+  # }
+
+  # provisioner "file" {
+  #   source      = "./kubernetes/kubernetes.nix"
+  #   destination = "/etc/nixos/kubernetes.nix"
+
+  #   connection {
+  #     type        = "ssh"
+  #     user        = "root"
+  #     password = ""
+  #     host     = network_interface.default.addresses.0
+  #   }
+  # }
+
+  # provisioner "remote-exec" {
+  #   inline = [
+  #     "nixos-generate-config",
+  #     "nixos-rebuild switch",
+  #     "reboot",
+  #   ]
+  # }
+}

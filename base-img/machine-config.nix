@@ -27,5 +27,8 @@ with lib;
       permitRootLogin = "yes";
     };
 
+    # Enable the guest agent
+    services.qemuGuest.enable = true;
+
   };
 }
