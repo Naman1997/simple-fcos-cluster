@@ -62,8 +62,6 @@
     permitRootLogin = "yes";
   };
 
-  users.extraUsers.root.password = "";
-
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];

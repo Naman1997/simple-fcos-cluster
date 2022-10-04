@@ -19,8 +19,6 @@ with lib;
     boot.loader.grub.device = "/dev/vda";
     boot.loader.timeout = 0;
 
-    users.extraUsers.root.password = "";
-
     # Enable the OpenSSH daemon.
     services.openssh = {
       enable = true;
@@ -29,6 +27,9 @@ with lib;
 
     # Enable the guest agent
     services.qemuGuest.enable = true;
+
+    # Enable cloud-init
+    services.cloud-init.enable = true;
 
   };
 }
