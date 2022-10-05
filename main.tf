@@ -19,9 +19,17 @@ resource "libvirt_pool" "nixos" {
   path = "/tmp/terraform-provider-libvirt-pool-nixos"
 }
 
-# We fetch the 22.05 nixos release image from their mirrors
-resource "libvirt_volume" "nixos-iso" {
-  name   = "nixos-iso"
+resource "libvirt_volume" "master-nixos-img" {
+  name   = format("master-nixos-img-%s", count.index)
+  count  = var.MASTER_COUNT
+  pool   = libvirt_pool.nixos.name
+  source = "./base-img/nixos.qcow2"
+  format = "qcow2"
+}
+
+resource "libvirt_volume" "worker-nixos-img" {
+  name   = format("worker-nixos-img-%s", count.index)
+  count  = var.WORKER_COUNT
   pool   = libvirt_pool.nixos.name
   source = "./base-img/nixos.qcow2"
   format = "qcow2"
@@ -37,11 +45,11 @@ resource "libvirt_cloudinit_disk" "commoninit" {
   pool      = libvirt_pool.nixos.name
 }
 
-# Create the machine
-resource "libvirt_domain" "domain-nixos" {
-  name      = "nixos-terraform"
-  memory    = "4096"
-  vcpu      = 2
+resource "libvirt_domain" "masters" {
+  count     = var.MASTER_COUNT
+  name      = format("master%s", count.index)
+  memory    = var.master_config.memory
+  vcpu      = var.master_config.vcpus
   cloudinit = libvirt_cloudinit_disk.commoninit.id
 
   cpu {
@@ -49,7 +57,8 @@ resource "libvirt_domain" "domain-nixos" {
   }
 
   network_interface {
-    network_name = "default"
+    network_name   = "default"
+    wait_for_lease = true
   }
 
   console {
@@ -65,7 +74,7 @@ resource "libvirt_domain" "domain-nixos" {
   }
 
   disk {
-    volume_id = libvirt_volume.nixos-iso.id
+    volume_id = element(libvirt_volume.master-nixos-img.*.id, count.index)
   }
 
   graphics {
@@ -74,42 +83,88 @@ resource "libvirt_domain" "domain-nixos" {
     autoport    = true
   }
 
-  # connection {
-  #   type     = "ssh"
-  #   user     = "root"
-  #   password = ""
-  #   host     = network_interface.default.addresses.0
-  # }
+  provisioner "local-exec" {
+    command = "ssh-keygen -R ${self.network_interface[0].addresses[0]}"
+    when    = destroy
+  }
 
-  # provisioner "file" {
-  #   source      = "./kubernetes/configuration.nix"
-  #   destination = "/etc/nixos/configuration.nix"
+  provisioner "local-exec" {
+    command = "ssh -q -o StrictHostKeyChecking=no root@${self.network_interface[0].addresses[0]} exit"
+    when    = create
+  }
 
-  #   connection {
-  #     type        = "ssh"
-  #     user        = "root"
-  #     password = ""
-  #     host     = network_interface.default.addresses.0
-  #   }
-  # }
-
-  # provisioner "file" {
-  #   source      = "./kubernetes/kubernetes.nix"
-  #   destination = "/etc/nixos/kubernetes.nix"
-
-  #   connection {
-  #     type        = "ssh"
-  #     user        = "root"
-  #     password = ""
-  #     host     = network_interface.default.addresses.0
-  #   }
-  # }
-
-  # provisioner "remote-exec" {
-  #   inline = [
-  #     "nixos-generate-config",
-  #     "nixos-rebuild switch",
-  #     "reboot",
-  #   ]
-  # }
 }
+
+resource "libvirt_domain" "workers" {
+  count     = var.WORKER_COUNT
+  name      = format("worker%s", count.index)
+  memory    = var.worker_config.memory
+  vcpu      = var.worker_config.vcpus
+  cloudinit = libvirt_cloudinit_disk.commoninit.id
+
+  cpu {
+    mode = "host-passthrough"
+  }
+
+  network_interface {
+    network_name   = "default"
+    wait_for_lease = true
+  }
+
+  console {
+    type        = "pty"
+    target_port = "0"
+    target_type = "serial"
+  }
+
+  console {
+    type        = "pty"
+    target_type = "virtio"
+    target_port = "1"
+  }
+
+  disk {
+    volume_id = element(libvirt_volume.worker-nixos-img.*.id, count.index)
+  }
+
+  graphics {
+    type        = "spice"
+    listen_type = "address"
+    autoport    = true
+  }
+
+  provisioner "local-exec" {
+    command = "ssh-keygen -R ${tostring(self.network_interface[0].addresses[0])}"
+    when    = destroy
+  }
+
+  provisioner "local-exec" {
+    command = "ssh -q -o StrictHostKeyChecking=no root@${self.network_interface[0].addresses[0]} exit"
+    when    = create
+  }
+
+}
+
+resource "local_file" "ansible_hosts" {
+
+  depends_on = [
+    libvirt_domain.masters,
+    libvirt_domain.workers
+  ]
+
+  content = templatefile("hosts.tmpl",
+    {
+      node_map_masters = zipmap(
+        tolist(libvirt_domain.masters[*].network_interface[0].addresses[0]), tolist(libvirt_domain.masters.*.name)
+      ),
+      node_map_workers = zipmap(
+        tolist(libvirt_domain.workers[*].network_interface[0].addresses[0]), tolist(libvirt_domain.workers.*.name)
+      ),
+      "ansible_port" = 22,
+      "ansible_user" = "root"
+    }
+  )
+  filename = "hosts"
+
+}
+
