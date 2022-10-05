@@ -84,13 +84,45 @@ resource "libvirt_domain" "masters" {
   }
 
   provisioner "local-exec" {
-    command = "ssh-keygen -R ${self.network_interface[0].addresses[0]}"
-    when    = destroy
+    command = <<-EOT
+      n=0
+      until [ "$n" -ge 5 ]
+      do
+        echo "Attempt number: $n"
+        ssh-keygen -R $ADDRESS < /dev/null
+        if [ $? -eq 0 ]; then
+          echo "Successfully removed $ADDRESS"
+          break
+        fi
+        n=$((n+1)) 
+        sleep $[ ( $RANDOM % 10 )  + 1 ]s
+      done
+    EOT
+    environment = {
+      ADDRESS = self.network_interface[0].addresses[0]
+    }
+    when = destroy
   }
 
   provisioner "local-exec" {
-    command = "ssh -q -o StrictHostKeyChecking=no root@${self.network_interface[0].addresses[0]} exit"
-    when    = create
+    command = <<-EOT
+      n=0
+      until [ "$n" -ge 5 ]
+      do
+        echo "Attempt number: $n"
+        ssh -q -o StrictHostKeyChecking=no root@$ADDRESS exit < /dev/null
+        if [ $? -eq 0 ]; then
+          echo "Successfully added $ADDRESS"
+          break
+        fi
+        n=$((n+1)) 
+        sleep $[ ( $RANDOM % 10 )  + 1 ]s
+      done
+    EOT
+    environment = {
+      ADDRESS = self.network_interface[0].addresses[0]
+    }
+    when = create
   }
 
 }
@@ -134,13 +166,45 @@ resource "libvirt_domain" "workers" {
   }
 
   provisioner "local-exec" {
-    command = "ssh-keygen -R ${tostring(self.network_interface[0].addresses[0])}"
-    when    = destroy
+    command = <<-EOT
+      n=0
+      until [ "$n" -ge 5 ]
+      do
+        echo "Attempt number: $n"
+        ssh-keygen -R $ADDRESS < /dev/null
+        if [ $? -eq 0 ]; then
+          echo "Successfully removed $ADDRESS"
+          break
+        fi
+        n=$((n+1)) 
+        sleep $[ ( $RANDOM % 10 )  + 1 ]s
+      done
+    EOT
+    environment = {
+      ADDRESS = self.network_interface[0].addresses[0]
+    }
+    when = destroy
   }
 
   provisioner "local-exec" {
-    command = "ssh -q -o StrictHostKeyChecking=no root@${self.network_interface[0].addresses[0]} exit"
-    when    = create
+    command = <<-EOT
+      n=0
+      until [ "$n" -ge 5 ]
+      do
+        echo "Attempt number: $n"
+        ssh -q -o StrictHostKeyChecking=no root@$ADDRESS exit < /dev/null
+        if [ $? -eq 0 ]; then
+          echo "Successfully added $ADDRESS"
+          break
+        fi
+        n=$((n+1)) 
+        sleep $[ ( $RANDOM % 10 )  + 1 ]s
+      done
+    EOT
+    environment = {
+      ADDRESS = self.network_interface[0].addresses[0]
+    }
+    when = create
   }
 
 }

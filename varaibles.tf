@@ -36,5 +36,5 @@ variable "MASTER_COUNT" {
 variable "WORKER_COUNT" {
   description = "Number of masters to create"
   type        = number
-  default = 1
+  default     = 1
 }
