@@ -5,6 +5,6 @@ This project is currently in progress.
 
 TODO:
 
-- Note down the manual steps needed to generate the cluster [Partially Done]
-- Automate the qcow2 image generation using packer. [Done in base-imag folder]
-- Automate the generation of the cluster using terraform.
+- Re-configure the master nodes
+- Re-configure the worker nodes
+- Add all nodes to the cluster

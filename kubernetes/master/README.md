@@ -20,7 +20,3 @@ Run the following command to access kubectl binary:
 mkdir -p .kube && ln -s /etc/kubernetes/cluster-admin.kubeconfig ~/.kube/config
 kubectl get nodes
 ```
-
-## Notes
-
-Build a basic VM with `terraform init && terraform apply`. You can access the VM using your default `id_rsa` ssh key.

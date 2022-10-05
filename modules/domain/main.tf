@@ -86,4 +86,15 @@ resource "libvirt_domain" "node" {
     }
     when = create
   }
+
+  connection {
+    type = "ssh"
+    user = "root"
+    host = self.network_interface[0].addresses[0]
+  }
+
+  provisioner "file" {
+    source      = "./kubernetes/configuration.nix"
+    destination = "/etc/nixos/configuration.nix"
+  }
 }

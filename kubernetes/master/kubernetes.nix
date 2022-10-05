@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 let
-  kubeMasterIP = "192.168.122.39";
+  kubeMasterIP = "x.x.x.x";
   kubeMasterHostname = "kube-master";
   kubeMasterAPIServerPort = 6443;
 in
