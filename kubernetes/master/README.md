@@ -6,15 +6,17 @@ Import the base image generated from the base-img folder into qemu and create a 
 
 SSH into this VM. User is root and there is no password set in the base image.
 
-Generate a new hardware config using `nixos-generate-config`
+Generate a new hardware config using `nixos-generate-config` on the VM and copy the hardware config of any master node to this dir
 
-Remove the existing `/etc/nixos/configuration.nix` and repalce it with the files in this folder.
+Create a docker container with the current dir added as a volume mount. The container should have nix-env.
 
-Update the IP address of the VM in `/etc/nixos/kubernetes.nix` under the variable `kubeMasterIP`.
+`nix-env -i nixops` [Need to check if there is a way to create a container with this preinstalled. This also seems to ask for a password, need to see if it can take in ssh keys as an input param - probably that can be sent as a file in this dir]
 
-Rebuild the config using `nixos-rebuild switch` and reboot.
+`nixops create -d kubernetes configuration.nix`
 
-Run the following command to access kubectl binary:
+`nixops deploy -d kubernetes --force-reboot`
+
+Run the following command to configure kubectl:
 
 ```
 mkdir -p .kube && ln -s /etc/kubernetes/cluster-admin.kubeconfig ~/.kube/config

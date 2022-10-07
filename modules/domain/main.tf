@@ -51,7 +51,7 @@ resource "libvirt_domain" "node" {
       until [ "$n" -ge 5 ]
       do
         echo "Attempt number: $n"
-        ssh-keygen -R $ADDRESS < /dev/null
+        ssh-keygen -R $ADDRESS
         if [ $? -eq 0 ]; then
           echo "Successfully removed $ADDRESS"
           break
