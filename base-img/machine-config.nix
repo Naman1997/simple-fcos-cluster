@@ -31,5 +31,7 @@ with lib;
     # Enable cloud-init
     services.cloud-init.enable = true;
 
+    users.extraUsers.root.password = "defaultNixPw";
+
   };
 }

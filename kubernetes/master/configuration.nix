@@ -1,8 +1,9 @@
 {
+
   master = 
     { config, pkgs, ... }:
   let
-    kubeMasterIP = "x.x.x.x";
+    kubeMasterIP = "192.168.122.13";
     kubeMasterHostname = "kube-master";
     kubeMasterAPIServerPort = 6443;
   in
@@ -13,8 +14,11 @@
         ./harware-configuration.nix
       ];
 
-      deployment.targetHost = "${kubeMasterIP}";
-    # resolve master hostname
+    # Deployment settings
+    deployment.targetEnv = "none";
+    deployment.targetHost = "${kubeMasterIP}";
+
+  
     networking.extraHosts = "${kubeMasterIP} ${kubeMasterHostname}";
 
     # packages for administration tasks

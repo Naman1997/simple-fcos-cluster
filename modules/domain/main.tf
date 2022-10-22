@@ -94,7 +94,7 @@ resource "libvirt_domain" "node" {
   }
 
   provisioner "file" {
-    source      = "./kubernetes/configuration.nix"
+    source      = "./kubernetes/master/configuration.nix"
     destination = "/etc/nixos/configuration.nix"
   }
 }
