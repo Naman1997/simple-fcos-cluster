@@ -10,4 +10,5 @@ ansible/
 *.qcow2
 */nix-build*
 */*/nix-build*
+*/*/out
 hosts

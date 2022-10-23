@@ -1,6 +1,6 @@
 # Create the master node
 
-## Manual Steps to create a cluster with just the master node
+## Manual Steps to create a master node
 
 ```
 docker run -it --rm -e kubeMasterIP=192.168.122.36 -v ~/.ssh/known_hosts:/root/.ssh/known_hosts:ro -v ~/.ssh/id_rsa:/root/.ssh/id_rsa -v "$(pwd)":/tmp nixos/nix:latest /bin/sh
