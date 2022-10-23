@@ -7,7 +7,7 @@ crash.log
 .terraform/
 .terraform.lock.hcl
 ansible/
-Footer
 *.qcow2
-base-img/nix-build*
+*/nix-build*
+*/*/nix-build*
 hosts
