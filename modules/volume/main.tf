@@ -11,6 +11,6 @@ terraform {
 resource "libvirt_volume" "volume" {
   name   = var.name
   pool   = "default"
-  source = "./base-img/coreos.qcow2"
+  source = "/var/lib/libvirt/images/coreos.qcow2"
   format = "qcow2"
 }

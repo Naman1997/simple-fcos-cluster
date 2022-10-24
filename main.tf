@@ -17,13 +17,13 @@ provider "libvirt" {
 
 module "master-ignition" {
   source = "./modules/ignition"
-  name    = format("master-ignition%s", count.index)
+  name    = format("master%s", count.index)
   count  = var.MASTER_COUNT
 }
 
 module "worker-ignition" {
   source = "./modules/ignition"
-  name    = format("worker-ignition%s", count.index)
+  name    = format("worker%s", count.index)
   count  = var.WORKER_COUNT
 }
 
