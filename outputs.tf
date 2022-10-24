@@ -1,4 +1,4 @@
-output "ansible_inventory" {
+output "output_log" {
   depends_on = [
     local_file.k0sctl_config
   ]
