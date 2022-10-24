@@ -17,13 +17,13 @@ provider "libvirt" {
 
 module "master-ignition" {
   source = "./modules/ignition"
-  name    = format("master%s", count.index)
+  name   = format("master%s", count.index)
   count  = var.MASTER_COUNT
 }
 
 module "worker-ignition" {
   source = "./modules/ignition"
-  name    = format("worker%s", count.index)
+  name   = format("worker%s", count.index)
   count  = var.WORKER_COUNT
 }
 
@@ -45,6 +45,7 @@ module "master_domain" {
   name            = format("master%s", count.index)
   memory          = var.master_config.memory
   vcpus           = var.master_config.vcpus
+  autostart       = var.autostart
   vol_id          = element(module.master-coreos-img.*.id, count.index)
   coreos_ignition = element(module.master-ignition.*.id, count.index)
 }
@@ -55,6 +56,7 @@ module "worker_domain" {
   name            = format("worker%s", count.index)
   memory          = var.worker_config.memory
   vcpus           = var.worker_config.vcpus
+  autostart       = var.autostart
   vol_id          = element(module.worker-coreos-img.*.id, count.index)
   coreos_ignition = element(module.worker-ignition.*.id, count.index)
 }
@@ -84,7 +86,7 @@ resource "local_file" "k0sctl_config" {
       k0sctl apply --config k0sctl.yaml
       k0sctl kubeconfig > ~/.kube/config
     EOT
-    when = create
+    when    = create
   }
 
 }

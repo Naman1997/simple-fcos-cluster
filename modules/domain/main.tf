@@ -13,6 +13,7 @@ resource "libvirt_domain" "node" {
   memory          = var.memory
   vcpu            = var.vcpus
   coreos_ignition = var.coreos_ignition
+  autostart       = var.autostart
   qemu_agent      = true
 
   cpu {

@@ -22,3 +22,8 @@ variable "coreos_ignition" {
   description = "Disk identifier for coreos_ignition"
   type        = string
 }
+
+variable "autostart" {
+  description = "Enable/Disable VM start on host bootup"
+  type        = bool
+}

@@ -42,3 +42,9 @@ variable "WORKER_COUNT" {
   type        = number
   default     = 1
 }
+
+variable "autostart" {
+  description = "Enable/Disable VM start on host bootup"
+  type        = bool
+  default     = false
+}

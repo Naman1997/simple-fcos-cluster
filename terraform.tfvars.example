@@ -1,5 +1,6 @@
 MASTER_COUNT = 1
 WORKER_COUNT = 1
+autostart = true
 master_config = {
     memory = "4096"
     vcpus  = 2

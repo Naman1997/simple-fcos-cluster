@@ -1,5 +1,5 @@
 # simple-fcos-cluster
-A simple k8s cluster using fcos and kvm
+A simple k8s cluster using fcos, kvm and k0sctl
 
 ## Dependencies
 
@@ -10,7 +10,7 @@ A simple k8s cluster using fcos and kvm
 
 ## One-time Configuration
 
-### Download qcow2 image and decompress in this folder
+### Fetch the QEMU base image
 
 Download the [qcow2 image of fcos](https://getfedora.org/en/coreos/download?tab=metal_virtualized&stream=stable&arch=x86_64), decompress it and move the final image to the default location for libvirt images.
 
