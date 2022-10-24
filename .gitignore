@@ -5,10 +5,7 @@
 *.tfstate.backup
 crash.log
 .terraform/
+.terraform*
 .terraform.lock.hcl
-ansible/
 *.qcow2
-*/nix-build*
-*/*/nix-build*
-*/*/out
-hosts
+k0sctl.yaml

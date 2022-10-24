@@ -3,76 +3,70 @@ terraform {
   required_providers {
     libvirt = {
       source  = "dmacvicar/libvirt"
-      version = "0.6.14"
+      version = "0.7.0"
+    }
+    ignition = {
+      source = "community-terraform-providers/ignition"
     }
   }
 }
 
-# instance the provider
 provider "libvirt" {
   uri = "qemu:///system"
 }
 
-resource "libvirt_pool" "nixos" {
-  name = "nixos"
-  type = "dir"
-  path = "/tmp/terraform-provider-libvirt-pool-nixos"
-}
-
-data "template_file" "user_data" {
-  template = file("${path.module}/cloud_init.cfg")
-}
-
-resource "libvirt_cloudinit_disk" "commoninit" {
-  name      = "commoninit.iso"
-  user_data = data.template_file.user_data.rendered
-  pool      = libvirt_pool.nixos.name
-}
-
-module "master-nixos-img" {
-  source = "./modules/volume"
-  name   = format("master-nixos-img-%s", count.index)
+module "master-ignition" {
+  source = "./modules/ignition"
+  name    = format("master-ignition%s", count.index)
   count  = var.MASTER_COUNT
-  pool   = libvirt_pool.nixos.name
 }
 
-module "worker-nixos-img" {
-  source = "./modules/volume"
-  name   = format("worker-nixos-img-%s", count.index)
+module "worker-ignition" {
+  source = "./modules/ignition"
+  name    = format("worker-ignition%s", count.index)
   count  = var.WORKER_COUNT
-  pool   = libvirt_pool.nixos.name
+}
+
+module "master-coreos-img" {
+  source = "./modules/volume"
+  name   = format("master-coreos-img-%s", count.index)
+  count  = var.MASTER_COUNT
+}
+
+module "worker-coreos-img" {
+  source = "./modules/volume"
+  name   = format("worker-coreos-img-%s", count.index)
+  count  = var.WORKER_COUNT
 }
 
 module "master_domain" {
-  source        = "./modules/domain"
-  count         = var.MASTER_COUNT
-  name          = format("master%s", count.index)
-  memory        = var.master_config.memory
-  vcpus         = var.master_config.vcpus
-  vol_id        = element(module.master-nixos-img.*.id, count.index)
-  pool          = libvirt_pool.nixos.name
-  cloud_init_id = libvirt_cloudinit_disk.commoninit.id
+  source          = "./modules/domain"
+  count           = var.MASTER_COUNT
+  name            = format("master%s", count.index)
+  memory          = var.master_config.memory
+  vcpus           = var.master_config.vcpus
+  vol_id          = element(module.master-coreos-img.*.id, count.index)
+  coreos_ignition = element(module.master-ignition.*.id, count.index)
 }
 
 module "worker_domain" {
-  source        = "./modules/domain"
-  count         = var.WORKER_COUNT
-  name          = format("worker%s", count.index)
-  memory        = var.worker_config.memory
-  vcpus         = var.worker_config.vcpus
-  vol_id        = element(module.worker-nixos-img.*.id, count.index)
-  pool          = libvirt_pool.nixos.name
-  cloud_init_id = libvirt_cloudinit_disk.commoninit.id
+  source          = "./modules/domain"
+  count           = var.WORKER_COUNT
+  name            = format("worker%s", count.index)
+  memory          = var.worker_config.memory
+  vcpus           = var.worker_config.vcpus
+  vol_id          = element(module.worker-coreos-img.*.id, count.index)
+  coreos_ignition = element(module.worker-ignition.*.id, count.index)
 }
 
-resource "local_file" "ansible_hosts" {
+resource "local_file" "k0sctl_config" {
 
   depends_on = [
     module.master_domain.node,
     module.worker_domain.node
   ]
 
-  content = templatefile("hosts.tmpl",
+  content = templatefile("k0s.tmpl",
     {
       node_map_masters = zipmap(
         tolist(module.master_domain.*.address), tolist(module.master_domain.*.name)
@@ -80,62 +74,17 @@ resource "local_file" "ansible_hosts" {
       node_map_workers = zipmap(
         tolist(module.worker_domain.*.address), tolist(module.worker_domain.*.name)
       ),
-      "ansible_port" = 22,
-      "ansible_user" = "root"
+      "user" = "core"
     }
   )
-  filename = "hosts"
+  filename = "k0sctl.yaml"
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      k0sctl apply --config k0sctl.yaml
+      k0sctl kubeconfig > ~/.kube/config
+    EOT
+    when = create
+  }
 
 }
-
-# Re-configure the master nodes
-# resource "null_resource" "configure_masters" {
-#   depends_on = [module.master_domain.node]
-
-#   for_each = {
-#     for index, vm in module.worker_domain :
-#     vm.name => vm
-#   }
-
-#   provisioner "remote-exec" {
-
-#     connection {
-#       type = "ssh"
-#       user = "root"
-#       host = each.value.address
-#     }
-
-#     inline = [
-#       "sleep2 && nixos-generate-config",
-#       "rm /etc/nixos/configuration.nix"
-#     ]
-#   }
-
-#   provisioner "file" {
-#     source      = "./kubernetes/master/kubernetes.nix"
-#     destination = "/etc/nixos/kubernetes.nix"
-#   }
-# }
-
-# Re-configure the worker nodes
-
-# Add all nodes to the cluster
-# resource "null_resource" "cluster" {
-#   # Changes to any instance of the cluster requires re-provisioning
-#   triggers = {
-#     cluster_instance_ids = "${join(",", aws_instance.cluster.*.id)}"
-#   }
-
-#   # Bootstrap script can run on any instance of the cluster
-#   # So we just choose the first in this case
-#   connection {
-#     host = "${element(aws_instance.cluster.*.public_ip, 0)}"
-#   }
-
-#   provisioner "remote-exec" {
-#     # Bootstrap script called with private_ip of each node in the cluster
-#     inline = [
-#       "bootstrap-cluster.sh ${join(" ", aws_instance.cluster.*.private_ip)}",
-#     ]
-#   }
-# }

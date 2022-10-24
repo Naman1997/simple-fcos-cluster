@@ -1,0 +1,20 @@
+apiVersion: k0sctl.k0sproject.io/v1beta1
+kind: Cluster
+metadata:
+  name: k0s-cluster
+spec:
+  hosts:
+%{ for node_host, node_hostname in node_map_masters ~}
+  - role: controller
+    ssh:
+      address: ${node_host}
+      user: ${user}
+      keyPath: ~/.ssh/id_rsa
+%{endfor}
+%{ for node_host, node_hostname in node_map_workers ~}
+  - role: worker
+    ssh:
+      address: ${node_host}
+      user: ${user}
+      keyPath: ~/.ssh/id_rsa
+%{endfor}

@@ -3,14 +3,14 @@ terraform {
   required_providers {
     libvirt = {
       source  = "dmacvicar/libvirt"
-      version = "0.6.14"
+      version = "0.7.0"
     }
   }
 }
 
 resource "libvirt_volume" "volume" {
   name   = var.name
-  pool   = var.pool
-  source = "./base-img/nixos.qcow2"
+  pool   = "default"
+  source = "./base-img/coreos.qcow2"
   format = "qcow2"
 }

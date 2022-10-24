@@ -3,16 +3,17 @@ terraform {
   required_providers {
     libvirt = {
       source  = "dmacvicar/libvirt"
-      version = "0.6.14"
+      version = "0.7.0"
     }
   }
 }
 
 resource "libvirt_domain" "node" {
-  name      = var.name
-  memory    = var.memory
-  vcpu      = var.vcpus
-  cloudinit = var.cloud_init_id
+  name            = var.name
+  memory          = var.memory
+  vcpu            = var.vcpus
+  coreos_ignition = var.coreos_ignition
+  qemu_agent      = true
 
   cpu {
     mode = "host-passthrough"
@@ -72,7 +73,7 @@ resource "libvirt_domain" "node" {
       until [ "$n" -ge 5 ]
       do
         echo "Attempt number: $n"
-        ssh -q -o StrictHostKeyChecking=no root@$ADDRESS exit < /dev/null
+        ssh -q -o StrictHostKeyChecking=no core@$ADDRESS exit < /dev/null
         if [ $? -eq 0 ]; then
           echo "Successfully added $ADDRESS"
           break
@@ -85,16 +86,5 @@ resource "libvirt_domain" "node" {
       ADDRESS = self.network_interface[0].addresses[0]
     }
     when = create
-  }
-
-  connection {
-    type = "ssh"
-    user = "root"
-    host = self.network_interface[0].addresses[0]
-  }
-
-  provisioner "file" {
-    source      = "./kubernetes/master/configuration.nix"
-    destination = "/etc/nixos/configuration.nix"
   }
 }

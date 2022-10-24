@@ -18,12 +18,7 @@ variable "vol_id" {
   type        = string
 }
 
-variable "pool" {
-  description = "Pool name"
-  type        = string
-}
-
-variable "cloud_init_id" {
-  description = "Disk identifier for cloud_init"
+variable "coreos_ignition" {
+  description = "Disk identifier for coreos_ignition"
   type        = string
 }
