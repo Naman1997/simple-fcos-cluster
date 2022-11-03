@@ -1,5 +1,5 @@
 # simple-fcos-cluster
-A simple k8s cluster using fcos, kvm and k0sctl
+A simple kubernetes cluster using fcos, kvm and k0sctl
 
 ## Dependencies
 
