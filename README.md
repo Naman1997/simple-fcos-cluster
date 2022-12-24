@@ -29,7 +29,7 @@ mv coreos.qcow2 /var/lib/libvirt/images/
 ### Create a tfvars file
 
 ```
-cp terraform.tfvars.example terraform.tfvars.example terraform.tfvars
+cp terraform.tfvars.example terraform.tfvars
 # Edit and save the variables according to your liking
 vim terraform.tfvars
 ```
