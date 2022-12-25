@@ -11,14 +11,6 @@ A simple kubernetes cluster using fcos, kvm and k0sctl
 
 ## One-time Configuration
 
-### Create a tfvars file
-
-```
-cp terraform.tfvars.example terraform.tfvars
-# Edit and save the variables according to your liking
-vim terraform.tfvars
-```
-
 ### Create an HA Proxy Server
 
 This is a manual step. I set this up on my Raspberry Pi. You can choose to do the same in a LXC container or a VM.
@@ -30,6 +22,14 @@ Make sure that the path to the config is always `/etc/haproxy/haproxy.cfg` and m
 apt-get install haproxy
 systemctl enable haproxy
 systemctl start haproxy
+```
+
+### Create a tfvars file
+
+```
+cp terraform.tfvars.example terraform.tfvars
+# Edit and save the variables according to your liking
+vim terraform.tfvars
 ```
 
 
