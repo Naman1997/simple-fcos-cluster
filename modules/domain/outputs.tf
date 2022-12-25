@@ -1,9 +1,9 @@
 output "address" {
-  value       = libvirt_domain.node.network_interface[0].addresses[0]
+  value       = proxmox_vm_qemu.node.ssh_host
   description = "IP Address of the node"
 }
 
 output "name" {
-  value       = libvirt_domain.node.name
+  value       = proxmox_vm_qemu.node.name
   description = "Name of the node"
 }

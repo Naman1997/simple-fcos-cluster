@@ -1,4 +1,4 @@
 output "id" {
-  value       = libvirt_ignition.ignition.id
-  description = "ID of ignition volume"
+  value       = "/tmp/ignition_${var.name}.ign"
+  description = "Ignition file name"
 }

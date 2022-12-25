@@ -3,27 +3,25 @@ A simple kubernetes cluster using fcos, kvm and k0sctl
 
 ## Dependencies
 
-- [libvirt](https://en.wikipedia.org/wiki/Libvirt)
+- [proxmox-ve](https://www.proxmox.com/en/proxmox-ve)
 - [terraform](https://www.terraform.io/)
 - [xz](https://en.wikipedia.org/wiki/XZ_Utils)
 - [k0sctl](https://github.com/k0sproject/k0sctl)
+- [haproxy](http://www.haproxy.org/)
 
 ## One-time Configuration
 
-### Fetch the QEMU base image
+### Create an HA Proxy Server
 
-Download the [qcow2 image of fcos](https://getfedora.org/en/coreos/download?tab=metal_virtualized&stream=stable&arch=x86_64), decompress it and move the final image to the default location for libvirt images.
+This is a manual step. I set this up on my Raspberry Pi. You can choose to do the same in a LXC container or a VM.
 
-You may also need to install [xz](https://en.wikipedia.org/wiki/XZ_Utils) for your linux distribution to decompress the image.
+Make sure that the path to the config is always `/etc/haproxy/haproxy.cfg` and make sure that the service is enabled.
 
 ```
-# Download the compressed image
-wget https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/VERSION/x86_64/fedora-coreos-VERSION-qemu.x86_64.qcow2.xz -O coreos.qcow2.xz
-# Make sure to verify your image using checksum and signature
-# Decompress the image using xz
-xz -v -d coreos.qcow2.xz
-# Move image to default libvirt image location
-mv coreos.qcow2 /var/lib/libvirt/images/
+<!-- This step will change based on your package manager -->
+apt-get install haproxy
+systemctl enable haproxy
+systemctl start haproxy
 ```
 
 ### Create a tfvars file
@@ -34,7 +32,8 @@ cp terraform.tfvars.example terraform.tfvars
 vim terraform.tfvars
 ```
 
-## Creating the cluster
+
+### Creating the cluster
 
 ```
 terraform init -upgrade
@@ -43,9 +42,30 @@ terraform plan
 terraform apply --auto-approve
 ```
 
-## What does 'terraform apply' do?
+### What does 'terraform apply' do?
 
-- Creates ignition files and adds them to volumes for each worker and master nodes
-- Creates nodes with the ignition configurations and other params as specified in the tfvars
-- Creates a k0s cluster when the nodes are ready
-- Replaces ~/.kube/config with the new kubeconfig from k0sctl
+- Downloads a version of fcos depending on the tfvars
+- Converts the zipped image file to qcow2 and moves it to the proxmox node
+- Creates a template using the qcow2 image
+- Copies your public key `~/.ssh/id_rsa.pub` to the proxmox node
+- Creates ignition files with the ssh keys injected for each VM to be created
+- Creates nodes using the ignition configurations and other parameters  specified in `terraform.tfvars`
+- Updates the haproxy configuration on a VM/raspberry pi
+- Deploys a k0s cluster when the nodes are ready
+- Replaces `~/.kube/config` with the new kubeconfig from k0sctl
+
+
+#### TODO
+
+- Automate DHCP IP reservation
+
+
+#### Debugging HA Proxy
+
+```
+haproxy -c -f /etc/haproxy/haproxy.cfg
+```
+
+#### What about libvirt?
+
+There is a branch named ['kvm'](https://github.com/Naman1997/simple-fcos-cluster/tree/kvm) in the repo that has steps to create a similar cluster using the 'dmacvicar/libvirt' provider. I won't be maintaining that branch - but it can be used as a frame of reference for someone who wants to create a fcos based k8s cluser in their homelab.

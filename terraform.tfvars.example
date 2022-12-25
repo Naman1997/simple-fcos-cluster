@@ -1,11 +1,28 @@
+# Hypervisor config
+PROXMOX_API_ENDPOINT = "https://192.168.0.103:8006/api2/json"
+PROXMOX_USERNAME     = "root"
+PROXMOX_PASSWORD     = "password"
+PROXMOX_IP           = "192.168.0.100"
+DEFAULT_BRIDGE       = "vmbr0"
+TARGET_NODE          = "pve"
+
+# Cluster config
 MASTER_COUNT = 1
 WORKER_COUNT = 1
-autostart = true
+autostart    = true
 master_config = {
-    memory = "4096"
-    vcpus  = 2
+  memory  = "2048"
+  vcpus   = 2
+  sockets = 1
 }
 worker_config = {
-    memory = "4096"
-    vcpus  = 2
+  memory  = "2048"
+  vcpus   = 2
+  sockets = 1
 }
+fcos_version    = "37.20221127.3.0"
+k0s_version     = "1.25.4+k0s.0"
+
+# HA Proxy config
+ha_proxy_server = "192.168.0.101"
+ha_proxy_user   = "ubuntu"
