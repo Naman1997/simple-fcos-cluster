@@ -19,7 +19,21 @@ cp terraform.tfvars.example terraform.tfvars
 vim terraform.tfvars
 ```
 
-## Creating the cluster
+### Create an HA Proxy Server
+
+This is a manual step. I set this up on my Raspberry Pi. You can choose to do the same in an LXC container or a VM.
+
+Make sure that the path to the config is always /etc/haproxy/haproxy.cfg and make sure that the service is enabled.
+
+```
+<!-- This step will vary based on your package manager -->
+apt-get install haproxy
+systemctl enable haproxy
+systemctl start haproxy
+```
+
+
+### Creating the cluster
 
 ```
 terraform init -upgrade
@@ -28,7 +42,7 @@ terraform plan
 terraform apply --auto-approve
 ```
 
-## What does 'terraform apply' do?
+### What does 'terraform apply' do?
 
 - Downloads a version of fcos depending on the tfvars
 - Converts the zipped file to qcow2 and moves it to proxmox node
@@ -40,6 +54,13 @@ terraform apply --auto-approve
 - Replaces ~/.kube/config with the new kubeconfig from k0sctl
 
 
-## TODO
+#### TODO
 
 - Automate DHCP IP reservation
+
+
+#### Debugging HA Proxy
+
+```
+haproxy -c -f /etc/haproxy/haproxy.cfg
+```
