@@ -18,3 +18,17 @@ spec:
       user: ${user}
       keyPath: ~/.ssh/id_rsa
 %{endfor}
+  k0s:
+    version: ${k0s_version}
+    dynamicConfig: false
+    config:
+      apiVersion: k0s.k0sproject.io/v1beta1
+      kind: Cluster
+      metadata:
+        name: k0s
+      spec:
+        api:
+          port: 6443
+          externalAddress: ${ha_proxy_server}
+          sans:
+          - ${ha_proxy_server}

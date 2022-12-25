@@ -1,0 +1,68 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    - name: setup-qemu-ga.service
+      enabled: true
+      contents:  |
+        [Unit]
+        Description=Setup Required Packages
+        After=network-online.target
+        Wants=network-online.target
+        Before=zincati.service
+        ConditionPathExists=!/var/lib/ostree-setup.stamp
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=/bin/rpm-ostree install qemu-guest-agent
+        ExecStart=/bin/touch /var/lib/ostree-setup.stamp
+        ExecStart=/bin/systemctl --no-block reboot
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: fstrim.timer
+      enabled: true
+
+    - name: fstrim.service
+      dropins:
+        - name: override.conf
+          contents: |
+            [Service]
+            ExecStart=
+            ExecStart=/sbin/fstrim -av
+
+    - name: docker.service
+      enabled: true
+    - name: wait-for-dns.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Wait for DNS entries
+        Before=kubelet.service
+        [Service]
+        Type=oneshot
+        RemainAfterExit=true
+        ExecStart=/bin/sh -c 'while ! /usr/bin/grep '^[^#[:space:]]' /etc/resolv.conf > /dev/null; do sleep 1; done'
+        [Install]
+        RequiredBy=kubelet.service
+storage:
+  directories:
+    - path: /etc/kubernetes
+  files:
+    - path: /etc/sysctl.d/20-silence-audit.conf
+      mode: 0644
+      contents:
+        inline: kernel.printk=4
+    - path: /etc/hostname
+      mode: 0644
+      contents:
+        inline:
+          ${domain_name}
+passwd:
+  users:
+    - name: core
+      ssh_authorized_keys:
+        - ${ssh_authorized_key}

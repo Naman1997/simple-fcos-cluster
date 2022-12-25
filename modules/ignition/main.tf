@@ -1,53 +1,39 @@
 terraform {
-  required_version = ">= 0.13"
   required_providers {
-    libvirt = {
-      source  = "dmacvicar/libvirt"
-      version = "0.7.0"
-    }
-    ignition = {
-      source = "community-terraform-providers/ignition"
+    ct = {
+      source  = "poseidon/ct"
+      version = "~> 0.9"
     }
   }
 }
 
-data "ignition_user" "core" {
-  name                = "core"
-  ssh_authorized_keys = [file("~/.ssh/id_rsa.pub")]
-}
-
-data "ignition_systemd_unit" "qemu-agent" {
-  name    = "qemu-agent.service"
-  enabled = true
-  content = file("${path.module}/qemu-agent/qemu-agent.service")
-}
-
-data "ignition_file" "hostname" {
-  path = "/etc/hostname"
-  mode = 420 # decimal 0644
-
-  content {
-    content = var.name
+# Butane config
+data "template_file" "config" {
+  template = file("${path.module}/system-units/template.yaml")
+  vars = {
+    domain_name        = var.name
+    ssh_authorized_key = file("~/.ssh/id_rsa.pub")
   }
 }
 
-
-data "ignition_config" "startup" {
-  users = [
-    data.ignition_user.core.rendered,
-  ]
-
-  files = [
-    data.ignition_file.hostname.rendered,
-  ]
-
-  systemd = [
-    "${data.ignition_systemd_unit.qemu-agent.rendered}",
-  ]
+# Worker config converted to Ignition
+data "ct_config" "ignition" {
+  content = data.template_file.config.*.rendered[0]
+  strict  = true
 }
 
-resource "libvirt_ignition" "ignition" {
-  name    = var.name
-  pool    = "default"
-  content = data.ignition_config.startup.rendered
+# Send Ignition file to Proxmox server
+resource "null_resource" "proxmox_configs" {
+
+  connection {
+    type     = "ssh"
+    user     = var.proxmox_user
+    password = var.proxmox_password
+    host     = var.proxmox_host
+  }
+
+  provisioner "file" {
+    content     = data.ct_config.ignition.*.rendered[0]
+    destination = "/tmp/ignition_${var.name}.ign"
+  }
 }

@@ -3,28 +3,13 @@ A simple kubernetes cluster using fcos, kvm and k0sctl
 
 ## Dependencies
 
-- [libvirt](https://en.wikipedia.org/wiki/Libvirt)
+- [proxmox-ve](https://www.proxmox.com/en/proxmox-ve)
 - [terraform](https://www.terraform.io/)
 - [xz](https://en.wikipedia.org/wiki/XZ_Utils)
 - [k0sctl](https://github.com/k0sproject/k0sctl)
+- [haproxy](http://www.haproxy.org/)
 
 ## One-time Configuration
-
-### Fetch the QEMU base image
-
-Download the [qcow2 image of fcos](https://getfedora.org/en/coreos/download?tab=metal_virtualized&stream=stable&arch=x86_64), decompress it and move the final image to the default location for libvirt images.
-
-You may also need to install [xz](https://en.wikipedia.org/wiki/XZ_Utils) for your linux distribution to decompress the image.
-
-```
-# Download the compressed image
-wget https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/VERSION/x86_64/fedora-coreos-VERSION-qemu.x86_64.qcow2.xz -O coreos.qcow2.xz
-# Make sure to verify your image using checksum and signature
-# Decompress the image using xz
-xz -v -d coreos.qcow2.xz
-# Move image to default libvirt image location
-mv coreos.qcow2 /var/lib/libvirt/images/
-```
 
 ### Create a tfvars file
 
@@ -45,7 +30,16 @@ terraform apply --auto-approve
 
 ## What does 'terraform apply' do?
 
-- Creates ignition files and adds them to volumes for each worker and master nodes
+- Downloads a version of fcos depending on the tfvars
+- Converts the zipped file to qcow2 and moves it to proxmox node
+- Creates a template using the qcow2 image
+- Creates ignition files for each VM
 - Creates nodes with the ignition configurations and other params as specified in the tfvars
+- [MANUAL INTERVENTION NEEDED HERE] You need to update the IP addresses in your haproxy while the cluster is being brought up
 - Creates a k0s cluster when the nodes are ready
 - Replaces ~/.kube/config with the new kubeconfig from k0sctl
+
+
+## TODO
+
+- Automate configuration of the HA proxy server
