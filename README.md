@@ -35,11 +35,11 @@ terraform apply --auto-approve
 - Creates a template using the qcow2 image
 - Creates ignition files for each VM
 - Creates nodes with the ignition configurations and other params as specified in the tfvars
-- [MANUAL INTERVENTION NEEDED HERE] You need to update the IP addresses in your haproxy while the cluster is being brought up
+- Updates the haproxy configuration on a VM/raspberry pi
 - Creates a k0s cluster when the nodes are ready
 - Replaces ~/.kube/config with the new kubeconfig from k0sctl
 
 
 ## TODO
 
-- Automate configuration of the HA proxy server
+- Automate DHCP IP reservation

@@ -94,3 +94,7 @@ variable "k0s_version" {
 variable "ha_proxy_server" {
   type = string
 }
+
+variable "ha_proxy_user" {
+  type = string
+}

@@ -2,7 +2,7 @@ terraform {
   required_providers {
     proxmox = {
       source  = "telmate/proxmox"
-      version = "2.9.6"
+      version = "2.9.11"
     }
   }
 }
@@ -30,6 +30,9 @@ resource "null_resource" "download_fcos_image" {
 }
 
 resource "null_resource" "copy_qcow2_image" {
+  depends_on = [
+    null_resource.download_fcos_image
+  ]
   provisioner "remote-exec" {
     connection {
       host        = var.PROXMOX_IP
@@ -38,7 +41,8 @@ resource "null_resource" "copy_qcow2_image" {
     }
 
     inline = [
-      "mkdir -p /root/fcos-cluster"
+      "rm -rf /root/fcos-cluster",
+      "mkdir /root/fcos-cluster"
     ]
   }
 
@@ -55,6 +59,9 @@ resource "null_resource" "copy_qcow2_image" {
 }
 
 resource "null_resource" "copy_ssh_keys" {
+  depends_on = [
+    null_resource.copy_qcow2_image
+  ]
   provisioner "file" {
     source      = "~/.ssh/id_rsa.pub"
     destination = "/root/fcos-cluster/id_rsa.pub"
@@ -68,6 +75,9 @@ resource "null_resource" "copy_ssh_keys" {
 }
 
 resource "null_resource" "create_template" {
+  depends_on = [
+    null_resource.copy_ssh_keys
+  ]
   provisioner "remote-exec" {
     when = create
     connection {
@@ -84,7 +94,7 @@ resource "time_sleep" "sleep" {
   depends_on = [
     null_resource.create_template
   ]
-  create_duration = "10s"
+  create_duration = "30s"
 }
 
 module "master-ignition" {
@@ -106,6 +116,11 @@ module "worker-ignition" {
 }
 
 module "master_domain" {
+
+  depends_on = [
+    time_sleep.sleep
+  ]
+
   source         = "./modules/domain"
   count          = var.MASTER_COUNT
   name           = format("master%s", count.index)
@@ -118,6 +133,11 @@ module "master_domain" {
 }
 
 module "worker_domain" {
+
+  depends_on = [
+    time_sleep.sleep
+  ]
+
   source         = "./modules/domain"
   count          = var.WORKER_COUNT
   name           = format("worker%s", count.index)
@@ -129,11 +149,66 @@ module "worker_domain" {
   target_node    = var.TARGET_NODE
 }
 
-resource "local_file" "k0sctl_config" {
+
+resource "local_file" "haproxy_config" {
 
   depends_on = [
     module.master_domain.node,
     module.worker_domain.node
+  ]
+
+  content = templatefile("haproxy.tmpl",
+    {
+      node_map_masters = zipmap(
+        tolist(module.master_domain.*.address), tolist(module.master_domain.*.name)
+      ),
+      node_map_workers = zipmap(
+        tolist(module.worker_domain.*.address), tolist(module.worker_domain.*.name)
+      )
+    }
+  )
+  filename = "haproxy.cfg"
+
+  provisioner "remote-exec" {
+    connection {
+      host        = var.ha_proxy_server
+      user        = var.ha_proxy_user
+      private_key = file("~/.ssh/id_rsa")
+    }
+
+    inline = [
+      "sudo chown -R ubuntu: /etc/haproxy"
+    ]
+  }
+
+  provisioner "file" {
+    source      = "${path.root}/haproxy.cfg"
+    destination = "/etc/haproxy/haproxy.cfg"
+    connection {
+      type        = "ssh"
+      host        = var.ha_proxy_server
+      user        = var.ha_proxy_user
+      private_key = file("~/.ssh/id_rsa")
+    }
+  }
+
+  provisioner "remote-exec" {
+    connection {
+      host        = var.ha_proxy_server
+      user        = var.ha_proxy_user
+      private_key = file("~/.ssh/id_rsa")
+    }
+
+    inline = [
+      "sudo systemctl restart haproxy"
+    ]
+  }
+}
+
+resource "local_file" "k0sctl_config" {
+
+  depends_on = [
+    local_file.haproxy_config
   ]
 
   content = templatefile("k0s.tmpl",

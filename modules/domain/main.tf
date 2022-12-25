@@ -2,7 +2,7 @@ terraform {
   required_providers {
     proxmox = {
       source  = "telmate/proxmox"
-      version = "2.9.6"
+      version = "2.9.11"
     }
   }
 }
@@ -52,6 +52,7 @@ resource "proxmox_vm_qemu" "node" {
       until [ "$n" -ge 5 ]
       do
         echo "Attempt number: $n"
+        ssh-keyscan -H $ADDRESS >> ~/.ssh/known_hosts
         ssh -q -o StrictHostKeyChecking=no core@$ADDRESS exit < /dev/null
         if [ $? -eq 0 ]; then
           echo "Successfully added $ADDRESS"
@@ -65,5 +66,24 @@ resource "proxmox_vm_qemu" "node" {
       ADDRESS = self.ssh_host
     }
     when = create
+  }
+}
+
+resource "null_resource" "wait_for_ssh" {
+  depends_on = [
+    proxmox_vm_qemu.node
+  ]
+  provisioner "remote-exec" {
+    connection {
+      host        = proxmox_vm_qemu.node.ssh_host
+      user        = "core"
+      private_key = file("~/.ssh/id_rsa")
+      timeout     = "5m"
+    }
+
+    inline = [
+      "# Connected!",
+      "echo Connected to `hostname`"
+    ]
   }
 }

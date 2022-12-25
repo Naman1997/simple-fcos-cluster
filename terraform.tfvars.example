@@ -25,3 +25,4 @@ k0s_version     = "1.25.4+k0s.0"
 
 # HA Proxy config
 ha_proxy_server = "192.168.0.101"
+ha_proxy_user   = "ubuntu"

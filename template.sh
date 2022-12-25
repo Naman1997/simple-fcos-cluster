@@ -1,5 +1,5 @@
-qm destroy 7000
-sleep 3
+qm destroy 7000 --destroy-unreferenced-disks=1 --purge
+sleep 5
 qm create 7000 --memory 2048 --net0 virtio,bridge=vmbr0 --agent 1
 qm importdisk 7000 /root/fcos-cluster/coreos.qcow2 local-lvm
 qm set 7000 --scsihw virtio-scsi-single --scsi0 local-lvm:vm-7000-disk-0,cache=writeback,discard=on
