@@ -9,3 +9,4 @@ crash.log
 .terraform.lock.hcl
 *.qcow2
 k0sctl.yaml
+haproxy.cfg
