@@ -67,4 +67,4 @@ haproxy -c -f /etc/haproxy/haproxy.cfg
 
 #### What about libvirt?
 
-There is a branch named 'kvm' in the repo that has steps to create a similar cluster using the 'dmacvicar/libvirt' provider. I won't be maintaining that branch - but it can be used as a frame of reference for someone who wants to create a fcos based k8s cluser in their homelab.
+There is a branch named ['kvm'](https://github.com/Naman1997/simple-fcos-cluster/tree/kvm) in the repo that has steps to create a similar cluster using the 'dmacvicar/libvirt' provider. I won't be maintaining that branch - but it can be used as a frame of reference for someone who wants to create a fcos based k8s cluser in their homelab.
