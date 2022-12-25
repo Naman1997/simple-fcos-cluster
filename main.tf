@@ -177,7 +177,7 @@ resource "local_file" "haproxy_config" {
     }
 
     inline = [
-      "sudo chown -R ubuntu: /etc/haproxy"
+      "sudo chown -R ${var.ha_proxy_user}: /etc/haproxy"
     ]
   }
 
