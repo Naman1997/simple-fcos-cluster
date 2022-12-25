@@ -21,12 +21,12 @@ vim terraform.tfvars
 
 ### Create an HA Proxy Server
 
-This is a manual step. I set this up on my Raspberry Pi. You can choose to do the same in an LXC container or a VM.
+This is a manual step. I set this up on my Raspberry Pi. You can choose to do the same in a LXC container or a VM.
 
-Make sure that the path to the config is always /etc/haproxy/haproxy.cfg and make sure that the service is enabled.
+Make sure that the path to the config is always `/etc/haproxy/haproxy.cfg` and make sure that the service is enabled.
 
 ```
-<!-- This step will vary based on your package manager -->
+<!-- This step will change based on your package manager -->
 apt-get install haproxy
 systemctl enable haproxy
 systemctl start haproxy
