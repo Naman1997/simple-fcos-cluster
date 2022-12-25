@@ -45,13 +45,14 @@ terraform apply --auto-approve
 ### What does 'terraform apply' do?
 
 - Downloads a version of fcos depending on the tfvars
-- Converts the zipped file to qcow2 and moves it to proxmox node
+- Converts the zipped image file to qcow2 and moves it to the proxmox node
 - Creates a template using the qcow2 image
-- Creates ignition files for each VM
-- Creates nodes with the ignition configurations and other params as specified in the tfvars
+- Copies your public key `~/.ssh/id_rsa.pub` to the proxmox node
+- Creates ignition files with the ssh keys injected for each VM to be created
+- Creates nodes using the ignition configurations and other parameters  specified in `terraform.tfvars`
 - Updates the haproxy configuration on a VM/raspberry pi
-- Creates a k0s cluster when the nodes are ready
-- Replaces ~/.kube/config with the new kubeconfig from k0sctl
+- Deploys a k0s cluster when the nodes are ready
+- Replaces `~/.kube/config` with the new kubeconfig from k0sctl
 
 
 #### TODO
