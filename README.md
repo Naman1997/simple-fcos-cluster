@@ -48,7 +48,7 @@ vim terraform.tfvars
 ```
 
 
-### Creating the cluster
+## Creating the cluster
 
 ```
 terraform init -upgrade
@@ -63,26 +63,22 @@ terraform apply --auto-approve
 - Converts the zipped image file to qcow2 and moves it to the proxmox node
 - Creates a template using the qcow2 image
 - Copies your public key `~/.ssh/id_rsa.pub` to the proxmox node
-- Creates ignition files with the ssh keys injected for each VM to be created
+- Creates ignition files with the system units and ssh keys injected for each VM to be created
 - Creates nodes using the ignition configurations and other parameters  specified in `terraform.tfvars`
 - Updates the haproxy configuration on a VM/raspberry pi
 - Deploys a k0s cluster when the nodes are ready
 - Replaces `~/.kube/config` with the new kubeconfig from k0sctl
 
 
-#### TODO
+## Notes
 
-- Automate DHCP IP reservation
-- Add more documentation
-
-
-#### Debugging HA Proxy
+### Debugging HA Proxy
 
 ```
 haproxy -c -f /etc/haproxy/haproxy.cfg
 ```
 
-#### What about libvirt?
+### What about libvirt?
 
 There is a branch named ['kvm'](https://github.com/Naman1997/simple-fcos-cluster/tree/kvm) in the repo that has steps to create a similar cluster using the 'dmacvicar/libvirt' provider. I won't be maintaining that branch - but it can be used as a frame of reference for someone who wants to create a fcos based k8s cluser in their homelab.
 
