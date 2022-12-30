@@ -169,18 +169,6 @@ resource "local_file" "haproxy_config" {
   )
   filename = "haproxy.cfg"
 
-  provisioner "remote-exec" {
-    connection {
-      host        = var.ha_proxy_server
-      user        = var.ha_proxy_user
-      private_key = file("~/.ssh/id_rsa")
-    }
-
-    inline = [
-      "sudo chown -R ${var.ha_proxy_user}: /etc/haproxy"
-    ]
-  }
-
   provisioner "file" {
     source      = "${path.root}/haproxy.cfg"
     destination = "/etc/haproxy/haproxy.cfg"

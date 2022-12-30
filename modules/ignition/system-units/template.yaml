@@ -34,23 +34,9 @@ systemd:
             ExecStart=
             ExecStart=/sbin/fstrim -av
 
-    - name: docker.service
+    - name: containerd.service
       enabled: true
-    - name: wait-for-dns.service
-      enabled: true
-      contents: |
-        [Unit]
-        Description=Wait for DNS entries
-        Before=kubelet.service
-        [Service]
-        Type=oneshot
-        RemainAfterExit=true
-        ExecStart=/bin/sh -c 'while ! /usr/bin/grep '^[^#[:space:]]' /etc/resolv.conf > /dev/null; do sleep 1; done'
-        [Install]
-        RequiredBy=kubelet.service
 storage:
-  directories:
-    - path: /etc/kubernetes
   files:
     - path: /etc/sysctl.d/20-silence-audit.conf
       mode: 0644

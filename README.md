@@ -17,11 +17,26 @@ This is a manual step. I set this up on my Raspberry Pi. You can choose to do th
 
 Make sure that the path to the config is always `/etc/haproxy/haproxy.cfg` and make sure that the service is enabled.
 
+The user whose login you provide needs to own the same file.
+
 ```
 <!-- This step will change based on your package manager -->
 apt-get install haproxy
 systemctl enable haproxy
 systemctl start haproxy
+# Update username here
+chown -R username: /etc/haproxy
+```
+
+It's a good idea to create a non-root user just to manage haproxy access
+
+```
+# Run this from a user with root privileges
+sudo EDITOR=vim visudo
+%username ALL= (root) NOPASSWD: /bin/systemctl restart haproxy
+
+sudo addgroup username
+sudo adduser --disabled-password --ingroup wireproxy username
 ```
 
 ### Create a tfvars file
@@ -58,6 +73,7 @@ terraform apply --auto-approve
 #### TODO
 
 - Automate DHCP IP reservation
+- Add more documentation
 
 
 #### Debugging HA Proxy
