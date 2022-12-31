@@ -39,14 +39,6 @@ sudo addgroup username
 sudo adduser --disabled-password --ingroup wireproxy username
 ```
 
-#### Configure haproxy ingress controller
-
-You can follow this [doc](https://www.haproxy.com/documentation/kubernetes/latest/installation/community/external-mode/#install-the-ingress-controller-outside-of-your-cluster) for this setup
-
-```
-wget https://github.com/haproxytech/kubernetes-ingress/releases/download/v1.9.0/haproxy-ingress-controller_1.9.0_Linux_x86_64.tar.gz
-
-```
 
 ### Create a tfvars file
 
