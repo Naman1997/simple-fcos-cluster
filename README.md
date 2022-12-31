@@ -39,12 +39,31 @@ sudo addgroup username
 sudo adduser --disabled-password --ingroup wireproxy username
 ```
 
+#### Configure haproxy ingress controller
+
+You can follow this [doc](https://www.haproxy.com/documentation/kubernetes/latest/installation/community/external-mode/#install-the-ingress-controller-outside-of-your-cluster) for this setup
+
+```
+wget https://github.com/haproxytech/kubernetes-ingress/releases/download/v1.9.0/haproxy-ingress-controller_1.9.0_Linux_x86_64.tar.gz
+
+```
+
 ### Create a tfvars file
 
 ```
 cp terraform.tfvars.example terraform.tfvars
 # Edit and save the variables according to your liking
 vim terraform.tfvars
+```
+
+#### Tips
+
+```
+# Get the latest version of k0s
+K0S_VERSION=`curl https://api.github.com/repos/k0sproject/k0s/releases/latest -s | jq .name -r`
+
+# Get the latest version of coreos
+curl https://builds.coreos.fedoraproject.org/prod/streams/stable/releases.json -s | jq -r --arg name "$1" 'last(.releases[].version)'
 ```
 
 
@@ -85,3 +104,18 @@ There is a branch named ['kvm'](https://github.com/Naman1997/simple-fcos-cluster
 ### Video
 
 [Link](https://youtu.be/zdAQ3Llj3IU)
+
+
+## Using HAProxy as a Load Balancer
+
+Since I'm load-balancing ports 80 and 443 as well, we can deploy a nginx controller that uses that IP address for the LoadBalancer!
+
+```
+# Update the IP address in the controller yaml
+vim ./nginx-example/nginx-controller.yaml
+helm install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx --values ./nginx-example/nginx-controller.yaml --create-namespace
+kubectl create deployment nginx --image=nginx --replicas=5
+k expose deploy nginx --port 80
+k create -f ./nginx-example/ingress.yaml
+curl -k https://192.168.0.101
+```

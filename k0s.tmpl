@@ -32,5 +32,7 @@ spec:
           externalAddress: ${ha_proxy_server}
           sans:
           - ${ha_proxy_server}
+        network:
+          provider: calico
         telemetry:
           enabled: false
