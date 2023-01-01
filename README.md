@@ -81,23 +81,6 @@ terraform apply --auto-approve
 - Replaces `~/.kube/config` with the new kubeconfig from k0sctl
 
 
-## Notes
-
-### Debugging HA Proxy
-
-```
-haproxy -c -f /etc/haproxy/haproxy.cfg
-```
-
-### What about libvirt?
-
-There is a branch named ['kvm'](https://github.com/Naman1997/simple-fcos-cluster/tree/kvm) in the repo that has steps to create a similar cluster using the 'dmacvicar/libvirt' provider. I won't be maintaining that branch - but it can be used as a frame of reference for someone who wants to create a fcos based k8s cluser in their homelab.
-
-### Video
-
-[Link](https://youtu.be/zdAQ3Llj3IU)
-
-
 ## Using HAProxy as a Load Balancer
 
 Since I'm load-balancing ports 80 and 443 as well, we can deploy a nginx controller that uses that IP address for the LoadBalancer!
@@ -120,9 +103,24 @@ You'll also be needing a VPS in the cloud that can take in your traffic from a p
 
 Oracle provides a [free tier](https://www.oracle.com/in/cloud/free/) account with 4vcpus and 24GB of memory!
 
+To expose the traffic properly, follow [this](https://github.com/Naman1997/simple-fcos-cluster/blob/main/Wireguard_Setup.md) guide.
+
 For this setup, you'll be installing wireguard on the VPS and your raspberry pi/VM that is running haproxy. The traffic flow is shown in the image below.
 
 ![Wireguard_Flow](https://user-images.githubusercontent.com/19908560/210160691-8b00380f-be12-4f13-920a-fb3ef2616f73.jpg)
 
-To expose the traffic properly, follow [this](https://github.com/Naman1997/simple-fcos-cluster/blob/main/Wireguard_Setup.md) guide.
+## Notes
 
+### Debugging HA Proxy
+
+```
+haproxy -c -f /etc/haproxy/haproxy.cfg
+```
+
+### What about libvirt?
+
+There is a branch named ['kvm'](https://github.com/Naman1997/simple-fcos-cluster/tree/kvm) in the repo that has steps to create a similar cluster using the 'dmacvicar/libvirt' provider. I won't be maintaining that branch - but it can be used as a frame of reference for someone who wants to create a fcos based k8s cluser in their homelab.
+
+### Video
+
+[Link](https://youtu.be/zdAQ3Llj3IU)
