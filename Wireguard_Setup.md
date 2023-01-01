@@ -115,7 +115,9 @@ Many cloud providers use something called CGNAT to stop wireguard traffic.
 Follow the steps mentioned in this [repo](https://github.com/mochman/Bypass_CGNAT.git) to get around this.
 
 In the following instructions:
+
 Client = Raspberry Pi/VM running HAProxy
+
 Server = VPS in the cloud
 
 Assuming that you're using OCI as your cloud provider, you may have to follow the instructions below to fix some issues with the script.
