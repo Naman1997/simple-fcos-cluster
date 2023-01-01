@@ -111,3 +111,17 @@ k expose deploy nginx --port 80
 k create -f ./nginx-example/ingress.yaml
 curl -k https://192.168.0.101
 ```
+
+## Exposing your cluster to the internet with a free subdomain!
+
+You'll need an account with duckdns - they provide you with a free subdomain that you can use to host your web services from your home internet.
+
+You'll also be needing a VPS in the cloud that can take in your traffic from a public IP address so that you don't expose your own local IP address.
+
+Oracle provides a [free tier](https://www.oracle.com/in/cloud/free/) account with 4vcpus and 24GB of memory!
+
+For this setup, you'll be installing wireguard on the VPS and your raspberry pi/VM that is running haproxy. The traffic flow is shown in the image below.
+
+![alt text](https://raw.githubusercontent.com/Naman1997/simple-fcos-cluster/main/Wireguard_Flow.drawio.png)
+
+To expose the traffic properly, follow [this]() guide.
