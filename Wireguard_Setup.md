@@ -137,8 +137,7 @@ sudo vim /etc/wireguard/wg0.conf
 ```
 - Copy the publickey of client and move to the config of server and also the other way around
 
-On clinet run this and select this option --> 2) Reload Wireguard Service
-Just press enter from that point onwards
+On clinet run the script mentioned below and select this option --> 2) Reload Wireguard Service. It will ask some questions regarding the config - just press enter from that point onwards to select the default config.
 
 ```
 # Only on the client
@@ -153,6 +152,37 @@ sudo systemctl restart wg-quick@wg0.service
 sudo wg show
 ```
 - If you see anything in the 'transfer' section - then this means the VPN is working!
+
+If you're still having trouble, refer to the client and server configs shown below.
+
+```
+# Server
+[Interface]
+Address = 10.1.0.1/24
+SaveConfig = true
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o br-e9809ca86b25 -j MASQUERADE;
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o br-e9809ca86b25 -j MASQUERADE;
+ListenPort = 55108
+PrivateKey = server_private_key
+
+[Peer]
+PublicKey = client_public_key
+AllowedIPs = 10.1.0.2/32
+```
+
+```
+#Client
+[Interface]
+PrivateKey = client_private_key
+Address = 10.1.0.2/24
+
+
+[Peer]
+PublicKey = server_public_key
+AllowedIPs = 0.0.0.0/0
+Endpoint = example.duckdns.org:55108
+PersistentKeepalive = 25
+```
 
 
 ## Notes
