@@ -42,7 +42,9 @@ resource "null_resource" "copy_qcow2_image" {
 
     inline = [
       "rm -rf /root/fcos-cluster",
-      "mkdir /root/fcos-cluster"
+      "mkdir /root/fcos-cluster",
+      "rm -rf /root/ignition",
+      "mkdir /root/ignition"
     ]
   }
 
@@ -98,6 +100,9 @@ resource "time_sleep" "sleep" {
 }
 
 module "master-ignition" {
+  depends_on = [
+    null_resource.copy_qcow2_image
+  ]
   source           = "./modules/ignition"
   name             = format("master%s", count.index)
   proxmox_user     = var.PROXMOX_USERNAME
@@ -107,6 +112,9 @@ module "master-ignition" {
 }
 
 module "worker-ignition" {
+  depends_on = [
+    null_resource.copy_qcow2_image
+  ]
   source           = "./modules/ignition"
   name             = format("worker%s", count.index)
   proxmox_user     = var.PROXMOX_USERNAME

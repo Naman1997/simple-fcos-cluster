@@ -18,7 +18,7 @@ resource "proxmox_vm_qemu" "node" {
   clone       = "coreos-golden"
   full_clone  = true
   boot        = "order=scsi0;net0"
-  args        = "-fw_cfg name=opt/com.coreos/config,file=/tmp/ignition_${var.name}.ign"
+  args        = "-fw_cfg name=opt/com.coreos/config,file=/root/ignition/ignition_${var.name}.ign"
 
   network {
     model  = "e1000"

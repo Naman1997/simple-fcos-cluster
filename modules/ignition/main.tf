@@ -34,6 +34,6 @@ resource "null_resource" "proxmox_configs" {
 
   provisioner "file" {
     content     = data.ct_config.ignition.*.rendered[0]
-    destination = "/tmp/ignition_${var.name}.ign"
+    destination = "/root/ignition/ignition_${var.name}.ign"
   }
 }
