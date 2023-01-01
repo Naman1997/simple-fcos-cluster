@@ -131,11 +131,11 @@ wg genkey | tee privatekey | wg pubkey > publickey
 ```
 
 - Copy the private key from file 'privatekey' and update in this file
-- Copy the publickey of client and move to the config of server and also the other way around
 
 ```
 sudo vim /etc/wireguard/wg0.conf
 ```
+- Copy the publickey of client and move to the config of server and also the other way around
 
 On clinet run this and select this option --> 2) Reload Wireguard Service
 Just press enter from that point onwards
