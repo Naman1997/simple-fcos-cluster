@@ -107,7 +107,7 @@ To expose the traffic properly, follow [this](https://github.com/Naman1997/simpl
 
 For this setup, you'll be installing wireguard on the VPS and your raspberry pi/VM that is running haproxy. The traffic flow is shown in the image below.
 
-![Wireguard_Flow](https://user-images.githubusercontent.com/19908560/210160691-8b00380f-be12-4f13-920a-fb3ef2616f73.jpg)
+![Wireguard_Flow drawio (1) drawio](https://user-images.githubusercontent.com/19908560/210160766-31491844-8ae0-41d9-b31c-7cfe5ee8669a.png)
 
 ## Notes
 
