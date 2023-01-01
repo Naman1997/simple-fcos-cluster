@@ -124,4 +124,4 @@ For this setup, you'll be installing wireguard on the VPS and your raspberry pi/
 
 ![alt text](https://raw.githubusercontent.com/Naman1997/simple-fcos-cluster/main/Wireguard_Flow.drawio.png)
 
-To expose the traffic properly, follow [this]() guide.
+To expose the traffic properly, follow [this](https://github.com/Naman1997/simple-fcos-cluster/blob/main/Wireguard_Setup.md) guide.
