@@ -122,6 +122,7 @@ Oracle provides a [free tier](https://www.oracle.com/in/cloud/free/) account wit
 
 For this setup, you'll be installing wireguard on the VPS and your raspberry pi/VM that is running haproxy. The traffic flow is shown in the image below.
 
-![alt text](https://raw.githubusercontent.com/Naman1997/simple-fcos-cluster/main/Wireguard_Flow.jpg)
+![Wireguard_Flow](https://user-images.githubusercontent.com/19908560/210160691-8b00380f-be12-4f13-920a-fb3ef2616f73.jpg)
 
 To expose the traffic properly, follow [this](https://github.com/Naman1997/simple-fcos-cluster/blob/main/Wireguard_Setup.md) guide.
+
