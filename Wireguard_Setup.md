@@ -1,7 +1,7 @@
 # Exposing private cluster over public internet
 
 This guide assumes that you're using a VM in OCI - this is not required and you can use any other cloud provider with slight changes to follow this guide.
-This guide also assumes that the wireguard client and server are using ubuntu - you can change the installation commands for your distro and follow this guide.
+This guide also assumes that the wireguard client and server are using Ubuntu - you can change the installation commands for your distro and follow this guide.
 
 
 ## Create the VM in OCI with a .pem file for ssh access
@@ -21,7 +21,7 @@ sudo reboot
 
 This step is only needed if you don't own a domain already.
 Create an account on [DuckDNS](https://www.duckdns.org/). After logging in, you'll see your token and your list of subdomains.
-Create a new subdomain and keep it's value handy for the following command.
+Create a new subdomain and keep its value handy for the following command.
 
 ```
 mkdir duckdns
@@ -98,7 +98,7 @@ Deploy nginx proxy manager.
 ```
 sudo docker-compose up -d
 ```
-In case you need to restart this compose after the wireguard connection - make sure to delete the data and letsencypt dirs.
+In case you need to restart this compose after the wireguard connection - make sure to delete the data and letsencrypt dirs.
 
 
 SSH using -L flag to port forward 8080
@@ -124,7 +124,7 @@ Server = VPS in the cloud
 Assuming that you're using OCI as your cloud provider, you may have to follow the instructions below to fix some issues with the script.
 
 - Modify the Endpoint on the client side to use the duckdns subdomain
-- Fix the public key on the client side - this will requre regenerating the wg keys for both client and server as the script seems to mess up the public key on the client side
+- Fix the public key on the client side - this will require regenerating the wg keys for both client and server as the script seems to mess up the public key on the client side
 
 ```
 # On both client and server
@@ -138,7 +138,7 @@ sudo vim /etc/wireguard/wg0.conf
 ```
 - Copy the publickey of client and move to the config of server and also the other way around
 
-On clinet run the script mentioned below and select this option --> 2) Reload Wireguard Service. It will ask some questions regarding the config - just press enter from that point onwards to select the default config.
+On client run the script mentioned below and select this option --> 2) Reload Wireguard Service. It will ask some questions regarding the config - just press enter from that point onwards to select the default config.
 
 ```
 # Only on the client
@@ -187,7 +187,7 @@ PersistentKeepalive = 25
 
 ## Re-using the same subdomain by using multi-path ingresses
 
-Let's say that you have one subdomain "example.duckdns.com" and you want to host a buch of websites using the same subdomain. Meaning you want to have websites with paths something like this:
+Let's say that you have one subdomain "example.duckdns.com" and you want to host a bunch of websites using the same subdomain. Meaning you want to have websites with paths something like this:
 
 - example.duckdns.com/wordpress
 - example.duckdns.com/blog
