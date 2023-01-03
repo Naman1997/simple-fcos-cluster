@@ -1,5 +1,6 @@
 # simple-fcos-cluster
-A simple kubernetes cluster using fcos, kvm and k0sctl
+A simple kubernetes cluster using Fedora Core OS, Proxmox and k0sctl.
+Documentation for exposing the cluster over wireguard is also provided - however this is a manual step at this point.
 
 ## Dependencies
 
@@ -8,6 +9,8 @@ A simple kubernetes cluster using fcos, kvm and k0sctl
 - [xz](https://en.wikipedia.org/wiki/XZ_Utils)
 - [k0sctl](https://github.com/k0sproject/k0sctl)
 - [haproxy](http://www.haproxy.org/)
+- [coreos](https://getfedora.org/coreos?stream=stable)
+- [wireguard](https://www.wireguard.com/) (Optional)
 
 ## One-time Configuration
 
@@ -71,9 +74,9 @@ terraform apply --auto-approve
 ### What does 'terraform apply' do?
 
 - Downloads a version of fcos depending on the tfvars
-- Converts the zipped image file to qcow2 and moves it to the proxmox node
+- Converts the zipped image file to qcow2 and moves it to the Proxmox node
 - Creates a template using the qcow2 image
-- Copies your public key `~/.ssh/id_rsa.pub` to the proxmox node
+- Copies your public key `~/.ssh/id_rsa.pub` to the Proxmox node
 - Creates ignition files with the system units and ssh keys injected for each VM to be created
 - Creates nodes using the ignition configurations and other parameters  specified in `terraform.tfvars`
 - Updates the haproxy configuration on a VM/raspberry pi
@@ -101,7 +104,7 @@ You'll need an account with duckdns - they provide you with a free subdomain tha
 
 You'll also be needing a VPS in the cloud that can take in your traffic from a public IP address so that you don't expose your own local IP address.
 
-Oracle provides a [free tier](https://www.oracle.com/in/cloud/free/) account with 4vcpus and 24GB of memory!
+Oracle provides a [free tier](https://www.oracle.com/in/cloud/free/) account with 4 vcpus and 24GB of memory!
 
 To expose the traffic properly, follow [this](https://github.com/Naman1997/simple-fcos-cluster/blob/main/Wireguard_Setup.md) guide.
 
@@ -119,7 +122,7 @@ haproxy -c -f /etc/haproxy/haproxy.cfg
 
 ### What about libvirt?
 
-There is a branch named ['kvm'](https://github.com/Naman1997/simple-fcos-cluster/tree/kvm) in the repo that has steps to create a similar cluster using the 'dmacvicar/libvirt' provider. I won't be maintaining that branch - but it can be used as a frame of reference for someone who wants to create a fcos based k8s cluser in their homelab.
+There is a branch named ['kvm'](https://github.com/Naman1997/simple-fcos-cluster/tree/kvm) in the repo that has steps to create a similar cluster using the 'dmacvicar/libvirt' provider. I won't be maintaining that branch - but it can be used as a frame of reference for someone who wants to create a Core OS based k8s cluser in their homelab.
 
 ### Video
 
