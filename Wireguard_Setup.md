@@ -50,6 +50,7 @@ Open only port 80 and 443 on the VM subnet settings.
 Port 8080 is for managing your proxy manager (with the port mapping in this config) - by default it will have very weak creds - we'll port forward the port over SSH to configure this securely later.
 ```
 mkdir nginx-proxy-manager
+cd nginx-proxy-manager
 vim docker-compose.yml
 ```
 
@@ -184,6 +185,30 @@ Endpoint = example.duckdns.org:55108
 PersistentKeepalive = 25
 ```
 
+## Re-using the same subdomain by using multi-path ingresses
+
+Let's say that you have one subdomain "example.duckdns.com" and you want to host a buch of websites using the same subdomain. Meaning you want to have websites with paths something like this:
+
+- example.duckdns.com/wordpress
+- example.duckdns.com/blog
+- example.duckdns.com/docs
+- example.duckdns.com/grafana
+
+In order to make this work properly, you'll need to add some annotations to rewrite the ingress path before it reaches the service endpoint in kubernetes. To do this, you need to add a rewrite-target annotation to your ingress. This annotation depends on what ingress controller you're using in your cluster.
+
+In case you're using the nginx ingress controller as shown in the main readme file of this repo, then you need to add the following annotation to your ingress resources.
+
+```
+nginx.ingress.kubernetes.io/rewrite-target: /$2
+```
+
+This is re-writing the path that is present in any path that has the following syntax:
+
+```
+- path: /something(/|$)(.*)
+```
+
+Read [this](https://github.com/kubernetes/ingress-nginx/blob/main/docs/examples/rewrite/README.md) document to learn more about the nginx ingress controller's rewrite-target annotation.
 
 ## Notes
 
