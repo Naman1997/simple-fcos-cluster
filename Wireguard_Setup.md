@@ -210,6 +210,47 @@ This is re-writing the path that is present in any path that has the following s
 
 Read [this](https://github.com/kubernetes/ingress-nginx/blob/main/docs/examples/rewrite/README.md) document to learn more about the nginx ingress controller's rewrite-target annotation.
 
+### Example Ingress
+
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    meta.helm.sh/release-name: longhorn
+    meta.helm.sh/release-namespace: longhorn-system
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  generation: 2
+  labels:
+    app: longhorn-ingress
+    app.kubernetes.io/instance: longhorn
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: longhorn
+    app.kubernetes.io/version: v1.4.0
+    helm.sh/chart: longhorn-1.4.0
+  name: longhorn-ingress
+  namespace: longhorn-system
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: example.duckdns.org
+    http:
+      paths:
+      - backend:
+          service:
+            name: longhorn-frontend
+            port:
+              number: 80
+        path: /longhorn(/|$)(.*)
+        pathType: ImplementationSpecific
+status:
+  loadBalancer:
+    ingress:
+    - ip: 192.168.0.101
+```
+
+Now longhorn will be accessible at `https://example.duckdns.org/longhorn/`
+
 ## Notes
 
 Make sure that your IP is not being leaked by checking your subdomain in https://ipleak.net/
