@@ -29,6 +29,27 @@ sudo addgroup wireproxy
 sudo adduser --disabled-password --ingroup wireproxy wireproxy
 ```
 
+You'll need to sure that you're able to ssh into this user account without a password. For example, let's say your default user is named 'ubuntu'. Follow these steps to enable passwordless SSH
+
+```
+# Change user/IP address here as needed
+ssh-copy-id -i ~/.ssh/id_rsa.pub ubuntu@192.168.0.100
+```
+
+Now you can either follow the same steps for wireproxy user (not recommended as we don't want to give wireproxy user a password) or you can copy the `~/.ssh/authorized_keys` file from the 'ubuntu' user to this user.
+
+```
+cat ~/.ssh/authorized_keys
+# Copy the value in a clipboard
+sudo su wireproxy
+# You're now logged in as wireproxy user
+vim ~/.ssh/authorized_keys
+# Paste the same key here
+exit
+# Make sure you're able to ssh in wireproxy user
+ssh wireproxy@192.168.0.100
+```
+
 Make sure that the path to the config is always `/etc/haproxy/haproxy.cfg` and make sure that the service is enabled.
 
 The user whose login you provide needs to own the same file.
