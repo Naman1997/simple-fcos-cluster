@@ -18,6 +18,17 @@ Documentation for exposing the cluster over wireguard is also provided - however
 
 This is a manual step. I set this up on my Raspberry Pi. You can choose to do the same in a LXC container or a VM.
 
+It's a good idea to create a non-root user just to manage haproxy access
+
+```
+# Run this from a user with root privileges
+sudo EDITOR=vim visudo
+%wireproxy ALL= (root) NOPASSWD: /bin/systemctl restart haproxy
+
+sudo addgroup wireproxy
+sudo adduser --disabled-password --ingroup wireproxy wireproxy
+```
+
 Make sure that the path to the config is always `/etc/haproxy/haproxy.cfg` and make sure that the service is enabled.
 
 The user whose login you provide needs to own the same file.
@@ -29,17 +40,6 @@ systemctl enable haproxy
 systemctl start haproxy
 # Update username here
 chown -R wireproxy: /etc/haproxy
-```
-
-It's a good idea to create a non-root user just to manage haproxy access
-
-```
-# Run this from a user with root privileges
-sudo EDITOR=vim visudo
-%wireproxy ALL= (root) NOPASSWD: /bin/systemctl restart haproxy
-
-sudo addgroup wireproxy
-sudo adduser --disabled-password --ingroup wireproxy wireproxy
 ```
 
 
