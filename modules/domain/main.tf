@@ -2,7 +2,7 @@ terraform {
   required_providers {
     proxmox = {
       source  = "telmate/proxmox"
-      version = "2.9.11"
+      version = "2.9.12"
     }
   }
 }
@@ -17,7 +17,7 @@ resource "proxmox_vm_qemu" "node" {
   agent       = 1
   clone       = "coreos-golden"
   full_clone  = true
-  boot        = "order=scsi0;net0"
+  boot        = "order=virtio0;net0"
   args        = "-fw_cfg name=opt/com.coreos/config,file=/root/ignition/ignition_${var.name}.ign"
 
   network {
@@ -28,7 +28,7 @@ resource "proxmox_vm_qemu" "node" {
   provisioner "local-exec" {
     command = <<-EOT
       n=0
-      until [ "$n" -ge 5 ]
+      until [ "$n" -ge 10 ]
       do
         echo "Attempt number: $n"
         ssh-keygen -R $ADDRESS
@@ -49,7 +49,7 @@ resource "proxmox_vm_qemu" "node" {
   provisioner "local-exec" {
     command = <<-EOT
       n=0
-      until [ "$n" -ge 5 ]
+      until [ "$n" -ge 10 ]
       do
         echo "Attempt number: $n"
         ssh-keyscan -H $ADDRESS >> ~/.ssh/known_hosts

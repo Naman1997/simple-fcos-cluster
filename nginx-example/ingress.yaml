@@ -5,7 +5,8 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - http:
+  - host: namansoracleapps.duckdns.org
+    http:
       paths:
       - path: /
         pathType: Prefix
