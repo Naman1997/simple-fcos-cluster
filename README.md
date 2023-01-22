@@ -28,7 +28,7 @@ apt-get install haproxy
 systemctl enable haproxy
 systemctl start haproxy
 # Update username here
-chown -R username: /etc/haproxy
+chown -R wireproxy: /etc/haproxy
 ```
 
 It's a good idea to create a non-root user just to manage haproxy access
@@ -36,10 +36,10 @@ It's a good idea to create a non-root user just to manage haproxy access
 ```
 # Run this from a user with root privileges
 sudo EDITOR=vim visudo
-%username ALL= (root) NOPASSWD: /bin/systemctl restart haproxy
+%wireproxy ALL= (root) NOPASSWD: /bin/systemctl restart haproxy
 
-sudo addgroup username
-sudo adduser --disabled-password --ingroup wireproxy username
+sudo addgroup wireproxy
+sudo adduser --disabled-password --ingroup wireproxy wireproxy
 ```
 
 
