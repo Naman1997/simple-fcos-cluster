@@ -31,7 +31,7 @@ variable "TARGET_NODE" {
 
 # Cluster config
 variable "MASTER_COUNT" {
-  description = "Number of masters to create"
+  description = "Number of masters to create (Should be an odd number)"
   type        = number
   validation {
     condition     = var.MASTER_COUNT % 2 == 1
@@ -41,19 +41,16 @@ variable "MASTER_COUNT" {
     condition     = var.MASTER_COUNT != 0
     error_message = "Number of master nodes cannot be 0"
   }
-  default = 1
 }
 
 variable "WORKER_COUNT" {
   description = "Number of workers to create"
   type        = number
-  default     = 1
 }
 
 variable "autostart" {
   description = "Enable/Disable VM start on host bootup"
   type        = bool
-  default     = false
 }
 
 variable "master_config" {
@@ -63,11 +60,6 @@ variable "master_config" {
     vcpus   = number
     sockets = number
   })
-  default = {
-    memory  = "4096"
-    vcpus   = 2
-    sockets = 1
-  }
 }
 
 variable "worker_config" {
@@ -77,11 +69,6 @@ variable "worker_config" {
     vcpus   = number
     sockets = number
   })
-  default = {
-    memory  = "4096"
-    vcpus   = 2
-    sockets = 1
-  }
 }
 
 # HA Proxy config

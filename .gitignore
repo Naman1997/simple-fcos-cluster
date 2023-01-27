@@ -11,3 +11,4 @@ crash.log
 k0sctl.yaml
 haproxy.cfg
 /nginx-example/ingress.yaml
+hosts
