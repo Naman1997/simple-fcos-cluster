@@ -1,6 +1,6 @@
 # simple-fcos-cluster
- [![Terraform](https://github.com/Naman1997/simple-fcos-cluster/actions/workflows/terraform.yml/badge.svg)](https://github.com/Naman1997/simple-fcos-cluster/actions/workflows/terraform.yml)
- [![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/Naman1997/simple-fcos-cluster/blob/main/LICENSE)
+[![Terraform](https://github.com/Naman1997/simple-fcos-cluster/actions/workflows/terraform.yml/badge.svg)](https://github.com/Naman1997/simple-fcos-cluster/actions/workflows/terraform.yml)
+[![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/Naman1997/simple-fcos-cluster/blob/main/LICENSE)
 
 A simple kubernetes cluster using Fedora Core OS, Proxmox and k0sctl.
 
@@ -22,7 +22,7 @@ A simple kubernetes cluster using Fedora Core OS, Proxmox and k0sctl.
 
 ### Make versions.sh executable
 
-I'm using a shell script to figure out the latest versions of coreos and k0s. In order to execute this terraform script, this file needs to be executable by the client where you're running `terraform apply`.
+A shell script is used to figure out the latest versions of coreos and k0s. This script needs to be executable by the client where you're running `terraform apply`.
 
 ```
 git clone https://github.com/Naman1997/simple-fcos-cluster.git
@@ -34,54 +34,12 @@ chmod +x ./versions.sh
 
 I've installed `haproxy` on my Raspberry Pi. You can choose to do the same in a LXC container or a VM.
 
-It's a good idea to create a non-root user just to manage haproxy access. In this example, the user is named `wireproxy`.
-
-```
-# Login to the Raspberry Pi
-# Install haproxy
-sudo apt-get install haproxy
-sudo systemctl enable haproxy
-sudo systemctl start haproxy
-# Run this from a user with sudo privileges
-sudo EDITOR=vim visudo
-%wireproxy ALL= (root) NOPASSWD: /bin/systemctl restart haproxy
-
-sudo addgroup wireproxy
-sudo adduser --disabled-password --ingroup wireproxy wireproxy
-```
-
-You'll need to make sure that you're able to ssh into this user account without a password. For example, let's say the user with sudo privileges is named `ubuntu`. Follow these steps to enable passwordless SSH for `ubuntu`.
-
-```
-# Run this from your Client
-# Change user/IP address here as needed
-ssh-copy-id -i ~/.ssh/id_rsa.pub ubuntu@192.168.0.100
-```
-
-Now you can either follow the same steps for the `wireproxy` user (not recommended as we don't want to give the `wireproxy` user a password) or you can copy the `~/.ssh/authorized_keys` file from the `ubuntu` user to this user.
-
-```
-# Login to the Raspberry Pi with user 'ubuntu'
-cat ~/.ssh/authorized_keys
-# Copy the value in a clipboard
-sudo su wireproxy
-# You're now logged in as wireproxy user
-vim ~/.ssh/authorized_keys
-# Paste the same key here
-# Logout from the Raspberry Pi
-# Make sure you're able to ssh in wireproxy user from your Client
-ssh wireproxy@192.168.0.100
-```
-
-Using the same example, the user `wireproxy` needs to own the files under `/etc/haproxy`
-
-```
-# Login to the Raspberry Pi with user 'ubuntu'
-sudo chown -R wireproxy: /etc/haproxy
-```
+You need to have passwordless SSH access to a user (from the Client node) in this node which has the permissions to modify the file `/etc/haproxy/haproxy.cfg` and permissions to run `sudo systemctl restart haproxy`. An example is covered in this [doc]()
 
 
 ### Create the terraform.tfvars file
+
+The variables needed to configure this script are documented in this [doc]()
 
 ```
 cp terraform.tfvars.example terraform.tfvars
@@ -102,9 +60,9 @@ terraform plan
 terraform apply --auto-approve
 ```
 
-## Using HAProxy as a Load Balancer for Ingress
+## Using HAProxy as a Load Balancer for an Ingress
 
-Since I'm load-balancing ports 80 and 443 using HAProxy, we can deploy nginx-controller such that it uses those ports as an external load balancer IP.
+Since HAProxy is load-balancing ports 80 and 443 (of worker nodes), we can deploy nginx-controller such that it uses those ports as an external load balancer IP.
 
 ```
 # Update the IP address in the controller yaml
