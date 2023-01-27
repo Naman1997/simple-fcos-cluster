@@ -34,12 +34,12 @@ chmod +x ./versions.sh
 
 I've installed `haproxy` on my Raspberry Pi. You can choose to do the same in a LXC container or a VM.
 
-You need to have passwordless SSH access to a user (from the Client node) in this node which has the permissions to modify the file `/etc/haproxy/haproxy.cfg` and permissions to run `sudo systemctl restart haproxy`. An example is covered in this [doc]()
+You need to have passwordless SSH access to a user (from the Client node) in this node which has the permissions to modify the file `/etc/haproxy/haproxy.cfg` and permissions to run `sudo systemctl restart haproxy`. An example is covered in this [doc](https://github.com/Naman1997/simple-fcos-cluster/blob/main/docs/HA_Proxy.md).
 
 
 ### Create the terraform.tfvars file
 
-The variables needed to configure this script are documented in this [doc]()
+The variables needed to configure this script are documented in this [doc](https://github.com/Naman1997/simple-fcos-cluster/blob/main/docs/Variables.md).
 
 ```
 cp terraform.tfvars.example terraform.tfvars
