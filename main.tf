@@ -14,8 +14,16 @@ provider "proxmox" {
   pm_tls_insecure = true
 }
 
+data "external" "versions" {
+  program = [
+    "${path.module}/scripts/versions.sh",
+  ]
+}
+
 locals {
-  iso_url = "https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/${var.fcos_version}/x86_64/fedora-coreos-${var.fcos_version}-qemu.x86_64.qcow2.xz"
+  fcos_version = data.external.versions.result["fcos_version"]
+  k0s_version = data.external.versions.result["k0s_version"]
+  iso_url = "https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/${local.fcos_version}/x86_64/fedora-coreos-${local.fcos_version}-qemu.x86_64.qcow2.xz"
 }
 
 resource "null_resource" "download_fcos_image" {
@@ -88,7 +96,7 @@ resource "null_resource" "create_template" {
       private_key = file("~/.ssh/id_rsa")
     }
 
-    script = "${path.root}/template.sh"
+    script = "${path.root}/scripts/template.sh"
   }
 }
 
@@ -216,7 +224,7 @@ resource "local_file" "k0sctl_config" {
         tolist(module.worker_domain.*.address), tolist(module.worker_domain.*.name)
       ),
       "user"        = "core",
-      "k0s_version" = var.k0s_version,
+      "k0s_version" = local.k0s_version,
       "ha_proxy_server" : var.ha_proxy_server
     }
   )
