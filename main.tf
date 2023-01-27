@@ -22,8 +22,8 @@ data "external" "versions" {
 
 locals {
   fcos_version = data.external.versions.result["fcos_version"]
-  k0s_version = data.external.versions.result["k0s_version"]
-  iso_url = "https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/${local.fcos_version}/x86_64/fedora-coreos-${local.fcos_version}-qemu.x86_64.qcow2.xz"
+  k0s_version  = data.external.versions.result["k0s_version"]
+  iso_url      = "https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/${local.fcos_version}/x86_64/fedora-coreos-${local.fcos_version}-qemu.x86_64.qcow2.xz"
 }
 
 resource "null_resource" "download_fcos_image" {
@@ -173,7 +173,7 @@ resource "local_file" "haproxy_config" {
     module.worker_domain.node
   ]
 
-  content = templatefile("haproxy.tmpl",
+  content = templatefile("${path.root}/templates/haproxy.tmpl",
     {
       node_map_masters = zipmap(
         tolist(module.master_domain.*.address), tolist(module.master_domain.*.name)
@@ -215,7 +215,7 @@ resource "local_file" "k0sctl_config" {
     local_file.haproxy_config
   ]
 
-  content = templatefile("k0s.tmpl",
+  content = templatefile("${path.root}/templates/k0s.tmpl",
     {
       node_map_masters = zipmap(
         tolist(module.master_domain.*.address), tolist(module.master_domain.*.name)
