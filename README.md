@@ -16,7 +16,7 @@ Documentation for exposing the cluster over wireguard is also provided - however
 | [HAproxy](http://www.haproxy.org/) | Raspberry Pi |
 | [Wireguard](https://www.wireguard.com/) (Optional) | Raspberry Pi |
 
-In the table above, 'Client' refers to the computer that will be executing `terraform apply` to create the cluster. The 'Raspberry Pi' can be replaced with a VM or a LXC container.
+In the table above, `Client` refers to the computer that will be executing `terraform apply` to create the cluster. The `Raspberry Pi` can be replaced with a VM or a LXC container.
 
 ## One-time Configuration
 
