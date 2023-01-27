@@ -96,7 +96,7 @@ sudo chown -R wireproxy: /etc/haproxy
 ```
 
 
-### Create a tfvars file
+### Create the terraform.tfvars file
 
 ```
 cp terraform.tfvars.example terraform.tfvars
@@ -109,8 +109,8 @@ vim terraform.tfvars
 
 ```
 terraform init -upgrade
+# You don't need to run the next command if you're using this repo for the 1st time
 # Only do this if you don't want to reuse the older coreos image existing in the current dir
-# You don't need to run this command if you're using this repo for the 1st time
 rm coreos.qcow2
 terraform plan
 # WARNING: The next command will override ~/.kube/config. Make a backup if needed.
@@ -134,17 +134,17 @@ k create -f ./nginx-example/ingress.yaml
 curl -k https://192.168.0.101
 ```
 
-## Exposing your cluster to the internet with a free subdomain!
+## Exposing your cluster to the internet with a free subdomain! (Optional)
 
 You'll need an account with duckdns - they provide you with a free subdomain that you can use to host your web services from your home internet.
 
-You'll also be needing a VPS in the cloud that can take in your traffic from a public IP address so that you don't expose your own local IP address.
+You'll also be needing a VPS in the cloud that can take in your traffic from a public IP address so that you don't expose your own IP address.
 
 Oracle provides a [free tier](https://www.oracle.com/in/cloud/free/) account with 4 vcpus and 24GB of memory!
 
 To expose the traffic properly, follow [this](https://github.com/Naman1997/simple-fcos-cluster/blob/main/Wireguard_Setup.md) guide.
 
-For this setup, you'll be installing wireguard on the VPS and your raspberry pi/VM that is running haproxy. The traffic flow is shown in the image below.
+For this setup, you'll be installing wireguard on the VPS and the node that is running haproxy. The traffic flow is shown in the image below.
 
 ![Wireguard_Flow drawio (1) drawio](https://user-images.githubusercontent.com/19908560/210160766-31491844-8ae0-41d9-b31c-7cfe5ee8669a.png)
 
