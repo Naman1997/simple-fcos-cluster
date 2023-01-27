@@ -3,35 +3,20 @@
  [![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/Naman1997/simple-fcos-cluster/blob/main/LICENSE)
 
 A simple kubernetes cluster using Fedora Core OS, Proxmox and k0sctl.
-Documentation for exposing the cluster over wireguard is also provided - however this is a manual step at this point.
 
 ## Dependencies
+
+`Client` refers to the node that will be executing `terraform apply` to create the cluster. The `Raspberry Pi` can be replaced with a VM or a LXC container. The items marked `Optional` are needed only when you want to expose your kubernetes services to the internet via WireGuard.
 
 | Dependency | Location |
 | ------ | ------ |
 | [Proxmox](https://www.proxmox.com/en/proxmox-ve) | Proxmox node |
+| [xz](https://en.wikipedia.org/wiki/XZ_Utils) | Proxmox node & Client |
 | [Terraform](https://www.terraform.io/) | Client |
-| [xz](https://en.wikipedia.org/wiki/XZ_Utils) | Client & Proxmox node |
 | [k0sctl](https://github.com/k0sproject/k0sctl) | Client |
 | [HAproxy](http://www.haproxy.org/) | Raspberry Pi |
-| [Wireguard](https://www.wireguard.com/) (Optional) | Raspberry Pi |
-
-In the table above, 'Client' refers to the computer that will be executing `terraform apply` to create the cluster. The 'Raspberry Pi' can be replaced with a VM or a LXC container.
-
-## Overview
-
-What does 'terraform apply' do?
-
-- Checks if the current dir already contains a file named `coreos.qcow2`.
-- If the file is not found, then it downloads the latest version of fcos.
-- Converts the zipped image file to a qcow2 file named `coreos.qcow2` and moves it to the Proxmox node.
-- Creates a template using the qcow2 image.
-- Copies your public key `~/.ssh/id_rsa.pub` to the Proxmox node.
-- Creates ignition files with the system units and ssh keys injected for each VM to be created.
-- Creates nodes using the ignition configurations and other parameters  specified in `terraform.tfvars`.
-- Updates the haproxy configuration on a VM/raspberry pi.
-- Deploys a k0s cluster when the nodes are ready. The latest version of k0s is used every time.
-- Replaces `~/.kube/config` with the new kubeconfig from k0sctl.
+| [Wireguard](https://www.wireguard.com/) (Optional) | Raspberry Pi & Cloud VPS |
+| [Docker](https://docs.docker.com/) (Optional) | Cloud VPS |
 
 ## One-time Configuration
 
@@ -117,9 +102,9 @@ terraform plan
 terraform apply --auto-approve
 ```
 
-## Using HAProxy as a Load Balancer
+## Using HAProxy as a Load Balancer for Ingress
 
-Since I'm load-balancing ports 80 and 443 as well, we can deploy a nginx controller that uses that IP address for the LoadBalancer!
+Since I'm load-balancing ports 80 and 443 using HAProxy, we can deploy nginx-controller such that it uses those ports as an external load balancer IP.
 
 ```
 # Update the IP address in the controller yaml
