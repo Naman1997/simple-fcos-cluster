@@ -83,14 +83,6 @@ variable "TARGET_NODE" {
   type        = string
 }
 
-variable "fcos_version" {
-  type = string
-}
-
-variable "k0s_version" {
-  type = string
-}
-
 variable "ha_proxy_server" {
   type = string
 }

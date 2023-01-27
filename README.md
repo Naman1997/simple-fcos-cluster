@@ -14,13 +14,25 @@ Documentation for exposing the cluster over wireguard is also provided - however
 
 ## One-time Configuration
 
+### Make versions.sh executable
+
+I'm using a shell script to figure out the latest versions of coreos and k0s. In order to execute this terraform script, this file needs to be executable by the client where you're running `terraform apply`.
+
+```
+git clone https://github.com/Naman1997/simple-fcos-cluster.git
+cd simple-fcos-cluster/scripts
+chmod +x ./versions.sh
+```
+
 ### Create an HA Proxy Server
 
-This is a manual step. I set this up on my Raspberry Pi. You can choose to do the same in a LXC container or a VM.
+This is a manual step. I've installed `haproxy` on my Raspberry Pi. You can choose to do the same in a LXC container or a VM.
 
 It's a good idea to create a non-root user just to manage haproxy access
 
 ```
+# Install haproxy
+sudo apt-get install haproxy
 # Run this from a user with root privileges
 sudo EDITOR=vim visudo
 %wireproxy ALL= (root) NOPASSWD: /bin/systemctl restart haproxy
@@ -77,6 +89,9 @@ vim terraform.tfvars
 
 ```
 terraform init -upgrade
+# Only do this if you don't want to reuse the older coreos image existing in the current dir
+# You don't need to run this command if you're using this repo for the 1st time
+rm coreos.qcow2
 terraform plan
 # WARNING: The next command will override ~/.kube/config. Make a backup if needed.
 terraform apply --auto-approve
@@ -84,14 +99,15 @@ terraform apply --auto-approve
 
 ### What does 'terraform apply' do?
 
-- Downloads a version of fcos depending on the tfvars
+- Checks if the current dir already contains a file named `coreos.qcow2`
+- If the file is not found, then it downloads the latest version of fcos
 - Converts the zipped image file to qcow2 and moves it to the Proxmox node
 - Creates a template using the qcow2 image
 - Copies your public key `~/.ssh/id_rsa.pub` to the Proxmox node
 - Creates ignition files with the system units and ssh keys injected for each VM to be created
 - Creates nodes using the ignition configurations and other parameters  specified in `terraform.tfvars`
 - Updates the haproxy configuration on a VM/raspberry pi
-- Deploys a k0s cluster when the nodes are ready
+- Deploys a k0s cluster when the nodes are ready. The latest version of k0s is used every time.
 - Replaces `~/.kube/config` with the new kubeconfig from k0sctl
 
 
