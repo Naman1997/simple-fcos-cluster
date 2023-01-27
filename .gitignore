@@ -10,4 +10,4 @@ crash.log
 *.qcow2
 k0sctl.yaml
 haproxy.cfg
-nginx-example/ingress.yaml
+./nginx-example/ingress.yaml
