@@ -7,6 +7,8 @@ Documentation for exposing the cluster over wireguard is also provided - however
 
 ## Dependencies
 
+Here, `Client` refers to the node that will be executing `terraform apply` to create the cluster. The `Raspberry Pi` can be replaced with a VM or a LXC container.
+
 | Dependency | Location |
 | ------ | ------ |
 | [Proxmox](https://www.proxmox.com/en/proxmox-ve) | Proxmox node |
@@ -15,8 +17,6 @@ Documentation for exposing the cluster over wireguard is also provided - however
 | [k0sctl](https://github.com/k0sproject/k0sctl) | Client |
 | [HAproxy](http://www.haproxy.org/) | Raspberry Pi |
 | [Wireguard](https://www.wireguard.com/) (Optional) | Raspberry Pi |
-
-In the table above, `Client` refers to the computer that will be executing `terraform apply` to create the cluster. The `Raspberry Pi` can be replaced with a VM or a LXC container.
 
 ## One-time Configuration
 
