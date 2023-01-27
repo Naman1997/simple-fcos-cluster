@@ -72,16 +72,6 @@ cp terraform.tfvars.example terraform.tfvars
 vim terraform.tfvars
 ```
 
-#### Tips
-
-```
-# Get the latest version of k0s
-K0S_VERSION=`curl https://api.github.com/repos/k0sproject/k0s/releases/latest -s | jq .name -r`
-
-# Get the latest version of coreos
-curl https://builds.coreos.fedoraproject.org/prod/streams/stable/releases.json -s | jq -r --arg name "$1" 'last(.releases[].version)'
-```
-
 
 ## Creating the cluster
 

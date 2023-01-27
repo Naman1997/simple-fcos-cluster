@@ -1,3 +1,5 @@
+#!/bin/bash
+# Not setting 'set -e' as id 7000 does not exist on 1st run
 qm destroy 7000 --destroy-unreferenced-disks=1 --purge
 sleep 5
 qm create 7000 --memory 2048 --net0 virtio,bridge=vmbr0 --agent 1
