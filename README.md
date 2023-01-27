@@ -1,4 +1,7 @@
 # simple-fcos-cluster
+ [![Terraform](https://github.com/Naman1997/simple-fcos-cluster/actions/workflows/terraform.yml/badge.svg)](https://github.com/Naman1997/simple-fcos-cluster/actions/workflows/terraform.yml)
+ [![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/Naman1997/simple-fcos-cluster/blob/main/LICENSE)
+
 A simple kubernetes cluster using Fedora Core OS, Proxmox and k0sctl.
 Documentation for exposing the cluster over wireguard is also provided - however this is a manual step at this point.
 
