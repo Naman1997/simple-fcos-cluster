@@ -50,7 +50,7 @@ sudo addgroup wireproxy
 sudo adduser --disabled-password --ingroup wireproxy wireproxy
 ```
 
-You'll need to make sure that you're able to ssh into this user account without a password. For example, let's say the user with sudo privileges is named `ubuntu`. Follow these steps to enable passwordless SSH.
+You'll need to make sure that you're able to ssh into this user account without a password. For example, let's say the user with sudo privileges is named `ubuntu`. Follow these steps to enable passwordless SSH for `ubuntu`.
 
 ```
 # Run this from your Client
