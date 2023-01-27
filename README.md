@@ -50,7 +50,7 @@ sudo addgroup wireproxy
 sudo adduser --disabled-password --ingroup wireproxy wireproxy
 ```
 
-You'll need to make sure that you're able to ssh into this user account without a password. For example, let's say your default user is named `ubuntu`. Follow these steps to enable passwordless SSH
+You'll need to make sure that you're able to ssh into this user account without a password. For example, let's say the user with sudo privileges is named `ubuntu`. Follow these steps to enable passwordless SSH.
 
 ```
 # Run this from your Client
@@ -58,7 +58,7 @@ You'll need to make sure that you're able to ssh into this user account without 
 ssh-copy-id -i ~/.ssh/id_rsa.pub ubuntu@192.168.0.100
 ```
 
-Now you can either follow the same steps for the wireproxy user (not recommended as we don't want to give the wireproxy user a password) or you can copy the `~/.ssh/authorized_keys` file from the 'ubuntu' user to this user.
+Now you can either follow the same steps for the `wireproxy` user (not recommended as we don't want to give the `wireproxy` user a password) or you can copy the `~/.ssh/authorized_keys` file from the `ubuntu` user to this user.
 
 ```
 # Login to the Raspberry Pi with user 'ubuntu'
@@ -157,7 +157,7 @@ haproxy -c -f /etc/haproxy/haproxy.cfg
 
 ### What about libvirt?
 
-There is a branch named ['kvm'](https://github.com/Naman1997/simple-fcos-cluster/tree/kvm) in the repo that has steps to create a similar cluster using the 'dmacvicar/libvirt' provider. I won't be maintaining that branch - but it can be used as a frame of reference for someone who wants to create a Core OS based k8s cluser in their homelab.
+There is a branch named ['kvm'](https://github.com/Naman1997/simple-fcos-cluster/tree/kvm) in the repo that has steps to create a similar cluster using the 'dmacvicar/libvirt' provider. I won't be maintaining that branch - but it can be used as a frame of reference for someone who wants to create a Core OS based k8s cluster in their homelab.
 
 ### Video
 
