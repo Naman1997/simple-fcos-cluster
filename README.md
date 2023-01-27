@@ -32,7 +32,7 @@ chmod +x ./versions.sh
 
 ### Create an HA Proxy Server
 
-This is a manual step. I've installed `haproxy` on my Raspberry Pi. You can choose to do the same in a LXC container or a VM.
+I've installed `haproxy` on my Raspberry Pi. You can choose to do the same in a LXC container or a VM.
 
 It's a good idea to create a non-root user just to manage haproxy access. In this example, the user is named `wireproxy`.
 
