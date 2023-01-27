@@ -136,15 +136,9 @@ curl -k https://192.168.0.101
 
 ## Exposing your cluster to the internet with a free subdomain! (Optional)
 
-You'll need an account with duckdns - they provide you with a free subdomain that you can use to host your web services from your home internet.
+You'll need an account with duckdns - they provide you with a free subdomain that you can use to host your web services from your home internet. You'll also be needing a VPS in the cloud that can take in your traffic from a public IP address so that you don't expose your own IP address. Oracle provides a [free tier](https://www.oracle.com/in/cloud/free/) account with 4 vcpus and 24GB of memory. I'll be using this to create a VM. To expose the traffic properly, follow [this](https://github.com/Naman1997/simple-fcos-cluster/blob/main/Wireguard_Setup.md) guide.
 
-You'll also be needing a VPS in the cloud that can take in your traffic from a public IP address so that you don't expose your own IP address.
-
-Oracle provides a [free tier](https://www.oracle.com/in/cloud/free/) account with 4 vcpus and 24GB of memory!
-
-To expose the traffic properly, follow [this](https://github.com/Naman1997/simple-fcos-cluster/blob/main/Wireguard_Setup.md) guide.
-
-For this setup, you'll be installing wireguard on the VPS and the node that is running haproxy. The traffic flow is shown in the image below.
+For this setup, we'll be installing wireguard on the VPS and the node that is running haproxy. The traffic flow is shown in the image below.
 
 ![Wireguard_Flow drawio (1) drawio](https://user-images.githubusercontent.com/19908560/210160766-31491844-8ae0-41d9-b31c-7cfe5ee8669a.png)
 
