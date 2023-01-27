@@ -111,7 +111,7 @@ module "master-ignition" {
   depends_on = [
     null_resource.copy_qcow2_image
   ]
-  source           = "${path.root}/modules/ignition"
+  source           = "./modules/ignition"
   name             = format("master%s", count.index)
   proxmox_user     = var.PROXMOX_USERNAME
   proxmox_password = var.PROXMOX_PASSWORD
@@ -123,7 +123,7 @@ module "worker-ignition" {
   depends_on = [
     null_resource.copy_qcow2_image
   ]
-  source           = "${path.root}/modules/ignition"
+  source           = "./modules/ignition"
   name             = format("worker%s", count.index)
   proxmox_user     = var.PROXMOX_USERNAME
   proxmox_password = var.PROXMOX_PASSWORD
@@ -137,7 +137,7 @@ module "master_domain" {
     time_sleep.sleep
   ]
 
-  source         = "${path.root}/modules/domain"
+  source         = "./modules/domain"
   count          = var.MASTER_COUNT
   name           = format("master%s", count.index)
   memory         = var.master_config.memory
@@ -154,7 +154,7 @@ module "worker_domain" {
     time_sleep.sleep
   ]
 
-  source         = "${path.root}/modules/domain"
+  source         = "./modules/domain"
   count          = var.WORKER_COUNT
   name           = format("worker%s", count.index)
   memory         = var.worker_config.memory
