@@ -20,8 +20,8 @@ worker_config = {
   vcpus   = 2
   sockets = 1
 }
-fcos_version    = "37.20221127.3.0"
-k0s_version     = "1.25.4+k0s.0"
+fcos_version    = "37.20230110.3.1"
+k0s_version     = "v1.26.0+k0s.0"
 
 # HA Proxy config
 ha_proxy_server = "192.168.0.101"

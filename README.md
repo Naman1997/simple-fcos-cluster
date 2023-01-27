@@ -115,6 +115,9 @@ vim ./nginx-example/nginx-controller.yaml
 helm install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx --values ./nginx-example/nginx-controller.yaml --create-namespace
 kubectl create deployment nginx --image=nginx --replicas=5
 k expose deploy nginx --port 80
+# Edit this config to point to your domain
+vim ./nginx-example/ingress.yaml.example
+mv ./nginx-example/ingress.yaml.example ./nginx-example/ingress.yaml
 k create -f ./nginx-example/ingress.yaml
 curl -k https://192.168.0.101
 ```
