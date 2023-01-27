@@ -6,7 +6,7 @@ A simple kubernetes cluster using Fedora Core OS, Proxmox and k0sctl.
 
 ## Dependencies
 
-`Client` refers to the node that will be executing `terraform apply` to create the cluster. The `Raspberry Pi` can be replaced with a VM or a LXC container. The items marked with `Optional` are needed only when you want to expose your kubernetes traffic via WireGuard.
+`Client` refers to the node that will be executing `terraform apply` to create the cluster. The `Raspberry Pi` can be replaced with a VM or a LXC container. The items marked `Optional` are needed only when you want to expose your kubernetes services to the internet via WireGuard.
 
 | Dependency | Location |
 | ------ | ------ |
