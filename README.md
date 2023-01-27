@@ -18,6 +18,21 @@ Documentation for exposing the cluster over wireguard is also provided - however
 
 In the table above, 'Client' refers to the computer that will be executing `terraform apply` to create the cluster. The 'Raspberry Pi' can be replaced with a VM or a LXC container.
 
+## Overview
+
+What does 'terraform apply' do?
+
+- Checks if the current dir already contains a file named `coreos.qcow2`.
+- If the file is not found, then it downloads the latest version of fcos.
+- Converts the zipped image file to a qcow2 file named `coreos.qcow2` and moves it to the Proxmox node.
+- Creates a template using the qcow2 image.
+- Copies your public key `~/.ssh/id_rsa.pub` to the Proxmox node.
+- Creates ignition files with the system units and ssh keys injected for each VM to be created.
+- Creates nodes using the ignition configurations and other parameters  specified in `terraform.tfvars`.
+- Updates the haproxy configuration on a VM/raspberry pi.
+- Deploys a k0s cluster when the nodes are ready. The latest version of k0s is used every time.
+- Replaces `~/.kube/config` with the new kubeconfig from k0sctl.
+
 ## One-time Configuration
 
 ### Make versions.sh executable
@@ -101,20 +116,6 @@ terraform plan
 # WARNING: The next command will override ~/.kube/config. Make a backup if needed.
 terraform apply --auto-approve
 ```
-
-### What does 'terraform apply' do?
-
-- Checks if the current dir already contains a file named `coreos.qcow2`
-- If the file is not found, then it downloads the latest version of fcos
-- Converts the zipped image file to qcow2 and moves it to the Proxmox node
-- Creates a template using the qcow2 image
-- Copies your public key `~/.ssh/id_rsa.pub` to the Proxmox node
-- Creates ignition files with the system units and ssh keys injected for each VM to be created
-- Creates nodes using the ignition configurations and other parameters  specified in `terraform.tfvars`
-- Updates the haproxy configuration on a VM/raspberry pi
-- Deploys a k0s cluster when the nodes are ready. The latest version of k0s is used every time.
-- Replaces `~/.kube/config` with the new kubeconfig from k0sctl
-
 
 ## Using HAProxy as a Load Balancer
 
