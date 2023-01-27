@@ -23,4 +23,4 @@ worker_config = {
 
 # HA Proxy config
 ha_proxy_server = "192.168.0.101"
-ha_proxy_user   = "ubuntu"
+ha_proxy_user   = "wireproxy"
