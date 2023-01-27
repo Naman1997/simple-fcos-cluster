@@ -238,3 +238,25 @@ resource "local_file" "k0sctl_config" {
     when    = create
   }
 }
+
+resource "local_file" "ansible_hosts" {
+
+  depends_on = [
+    local_file.haproxy_config
+  ]
+
+  content = templatefile("${path.root}/templates/ansible.tmpl",
+    {
+      node_map_masters = zipmap(
+        tolist(module.master_domain.*.address), tolist(module.master_domain.*.name)
+      ),
+      node_map_workers = zipmap(
+        tolist(module.worker_domain.*.address), tolist(module.worker_domain.*.name)
+      ),
+      "ansible_port" = 22,
+      "ansible_user" = "core"
+    }
+  )
+  filename = "hosts"
+
+}
