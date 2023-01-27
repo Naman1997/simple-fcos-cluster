@@ -7,13 +7,16 @@ Documentation for exposing the cluster over wireguard is also provided - however
 
 ## Dependencies
 
-- [proxmox-ve](https://www.proxmox.com/en/proxmox-ve)
-- [terraform](https://www.terraform.io/)
-- [xz](https://en.wikipedia.org/wiki/XZ_Utils)
-- [k0sctl](https://github.com/k0sproject/k0sctl)
-- [haproxy](http://www.haproxy.org/)
-- [coreos](https://getfedora.org/coreos?stream=stable)
-- [wireguard](https://www.wireguard.com/) (Optional)
+| Dependency | Location |
+| ------ | ------ |
+| [Proxmox](https://www.proxmox.com/en/proxmox-ve) | Proxmox node |
+| [Terraform](https://www.terraform.io/) | Client |
+| [xz](https://en.wikipedia.org/wiki/XZ_Utils) | Client & Proxmox node |
+| [k0sctl](https://github.com/k0sproject/k0sctl) | Client |
+| [HAproxy](http://www.haproxy.org/) | Raspberry Pi |
+| [Wireguard](https://www.wireguard.com/) (Optional) | Raspberry Pi |
+
+In the table above, 'Client' refers to the computer that will be executing `terraform apply` to create the cluster. The 'Raspberry Pi' can be replaced with a VM or a LXC container.
 
 ## One-time Configuration
 
@@ -31,12 +34,15 @@ chmod +x ./versions.sh
 
 This is a manual step. I've installed `haproxy` on my Raspberry Pi. You can choose to do the same in a LXC container or a VM.
 
-It's a good idea to create a non-root user just to manage haproxy access
+It's a good idea to create a non-root user just to manage haproxy access. In this example, the user is named `wireproxy`.
 
 ```
+# Login to the Raspberry Pi
 # Install haproxy
 sudo apt-get install haproxy
-# Run this from a user with root privileges
+sudo systemctl enable haproxy
+sudo systemctl start haproxy
+# Run this from a user with sudo privileges
 sudo EDITOR=vim visudo
 %wireproxy ALL= (root) NOPASSWD: /bin/systemctl restart haproxy
 
@@ -44,38 +50,34 @@ sudo addgroup wireproxy
 sudo adduser --disabled-password --ingroup wireproxy wireproxy
 ```
 
-You'll need to sure that you're able to ssh into this user account without a password. For example, let's say your default user is named 'ubuntu'. Follow these steps to enable passwordless SSH
+You'll need to make sure that you're able to ssh into this user account without a password. For example, let's say your default user is named `ubuntu`. Follow these steps to enable passwordless SSH
 
 ```
+# Run this from your Client
 # Change user/IP address here as needed
 ssh-copy-id -i ~/.ssh/id_rsa.pub ubuntu@192.168.0.100
 ```
 
-Now you can either follow the same steps for wireproxy user (not recommended as we don't want to give wireproxy user a password) or you can copy the `~/.ssh/authorized_keys` file from the 'ubuntu' user to this user.
+Now you can either follow the same steps for the wireproxy user (not recommended as we don't want to give the wireproxy user a password) or you can copy the `~/.ssh/authorized_keys` file from the 'ubuntu' user to this user.
 
 ```
+# Login to the Raspberry Pi with user 'ubuntu'
 cat ~/.ssh/authorized_keys
 # Copy the value in a clipboard
 sudo su wireproxy
 # You're now logged in as wireproxy user
 vim ~/.ssh/authorized_keys
 # Paste the same key here
-exit
-# Make sure you're able to ssh in wireproxy user
+# Logout from the Raspberry Pi
+# Make sure you're able to ssh in wireproxy user from your Client
 ssh wireproxy@192.168.0.100
 ```
 
-Make sure that the path to the config is always `/etc/haproxy/haproxy.cfg` and make sure that the service is enabled.
-
-The user whose login you provide needs to own the same file.
+Using the same example, the user `wireproxy` needs to own the files under `/etc/haproxy`
 
 ```
-<!-- This step will change based on your package manager -->
-apt-get install haproxy
-systemctl enable haproxy
-systemctl start haproxy
-# Update username here
-chown -R wireproxy: /etc/haproxy
+# Login to the Raspberry Pi with user 'ubuntu'
+sudo chown -R wireproxy: /etc/haproxy
 ```
 
 
@@ -147,7 +149,7 @@ For this setup, you'll be installing wireguard on the VPS and your raspberry pi/
 
 ## Notes
 
-### Debugging HA Proxy
+### Debugging HAProxy
 
 ```
 haproxy -c -f /etc/haproxy/haproxy.cfg
