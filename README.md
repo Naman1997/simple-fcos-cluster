@@ -7,13 +7,31 @@ Documentation for exposing the cluster over wireguard is also provided - however
 
 ## Dependencies
 
-- [proxmox-ve](https://www.proxmox.com/en/proxmox-ve)
-- [terraform](https://www.terraform.io/)
-- [xz](https://en.wikipedia.org/wiki/XZ_Utils)
-- [k0sctl](https://github.com/k0sproject/k0sctl)
-- [haproxy](http://www.haproxy.org/)
-- [coreos](https://getfedora.org/coreos?stream=stable)
-- [wireguard](https://www.wireguard.com/) (Optional)
+| Dependency | Location |
+| ------ | ------ |
+| [Proxmox](https://www.proxmox.com/en/proxmox-ve) | Proxmox node |
+| [Terraform](https://www.terraform.io/) | Client |
+| [xz](https://en.wikipedia.org/wiki/XZ_Utils) | Client & Proxmox node |
+| [k0sctl](https://github.com/k0sproject/k0sctl) | Client |
+| [HAproxy](http://www.haproxy.org/) | Raspberry Pi |
+| [Wireguard](https://www.wireguard.com/) (Optional) | Raspberry Pi |
+
+In the table above, 'Client' refers to the computer that will be executing `terraform apply` to create the cluster. The 'Raspberry Pi' can be replaced with a VM or a LXC container.
+
+## Overview
+
+What does 'terraform apply' do?
+
+- Checks if the current dir already contains a file named `coreos.qcow2`.
+- If the file is not found, then it downloads the latest version of fcos.
+- Converts the zipped image file to a qcow2 file named `coreos.qcow2` and moves it to the Proxmox node.
+- Creates a template using the qcow2 image.
+- Copies your public key `~/.ssh/id_rsa.pub` to the Proxmox node.
+- Creates ignition files with the system units and ssh keys injected for each VM to be created.
+- Creates nodes using the ignition configurations and other parameters  specified in `terraform.tfvars`.
+- Updates the haproxy configuration on a VM/raspberry pi.
+- Deploys a k0s cluster when the nodes are ready. The latest version of k0s is used every time.
+- Replaces `~/.kube/config` with the new kubeconfig from k0sctl.
 
 ## One-time Configuration
 
@@ -29,14 +47,17 @@ chmod +x ./versions.sh
 
 ### Create an HA Proxy Server
 
-This is a manual step. I've installed `haproxy` on my Raspberry Pi. You can choose to do the same in a LXC container or a VM.
+I've installed `haproxy` on my Raspberry Pi. You can choose to do the same in a LXC container or a VM.
 
-It's a good idea to create a non-root user just to manage haproxy access
+It's a good idea to create a non-root user just to manage haproxy access. In this example, the user is named `wireproxy`.
 
 ```
+# Login to the Raspberry Pi
 # Install haproxy
 sudo apt-get install haproxy
-# Run this from a user with root privileges
+sudo systemctl enable haproxy
+sudo systemctl start haproxy
+# Run this from a user with sudo privileges
 sudo EDITOR=vim visudo
 %wireproxy ALL= (root) NOPASSWD: /bin/systemctl restart haproxy
 
@@ -44,42 +65,38 @@ sudo addgroup wireproxy
 sudo adduser --disabled-password --ingroup wireproxy wireproxy
 ```
 
-You'll need to sure that you're able to ssh into this user account without a password. For example, let's say your default user is named 'ubuntu'. Follow these steps to enable passwordless SSH
+You'll need to make sure that you're able to ssh into this user account without a password. For example, let's say the user with sudo privileges is named `ubuntu`. Follow these steps to enable passwordless SSH for `ubuntu`.
 
 ```
+# Run this from your Client
 # Change user/IP address here as needed
 ssh-copy-id -i ~/.ssh/id_rsa.pub ubuntu@192.168.0.100
 ```
 
-Now you can either follow the same steps for wireproxy user (not recommended as we don't want to give wireproxy user a password) or you can copy the `~/.ssh/authorized_keys` file from the 'ubuntu' user to this user.
+Now you can either follow the same steps for the `wireproxy` user (not recommended as we don't want to give the `wireproxy` user a password) or you can copy the `~/.ssh/authorized_keys` file from the `ubuntu` user to this user.
 
 ```
+# Login to the Raspberry Pi with user 'ubuntu'
 cat ~/.ssh/authorized_keys
 # Copy the value in a clipboard
 sudo su wireproxy
 # You're now logged in as wireproxy user
 vim ~/.ssh/authorized_keys
 # Paste the same key here
-exit
-# Make sure you're able to ssh in wireproxy user
+# Logout from the Raspberry Pi
+# Make sure you're able to ssh in wireproxy user from your Client
 ssh wireproxy@192.168.0.100
 ```
 
-Make sure that the path to the config is always `/etc/haproxy/haproxy.cfg` and make sure that the service is enabled.
-
-The user whose login you provide needs to own the same file.
+Using the same example, the user `wireproxy` needs to own the files under `/etc/haproxy`
 
 ```
-<!-- This step will change based on your package manager -->
-apt-get install haproxy
-systemctl enable haproxy
-systemctl start haproxy
-# Update username here
-chown -R wireproxy: /etc/haproxy
+# Login to the Raspberry Pi with user 'ubuntu'
+sudo chown -R wireproxy: /etc/haproxy
 ```
 
 
-### Create a tfvars file
+### Create the terraform.tfvars file
 
 ```
 cp terraform.tfvars.example terraform.tfvars
@@ -92,27 +109,13 @@ vim terraform.tfvars
 
 ```
 terraform init -upgrade
+# You don't need to run the next command if you're using this repo for the 1st time
 # Only do this if you don't want to reuse the older coreos image existing in the current dir
-# You don't need to run this command if you're using this repo for the 1st time
 rm coreos.qcow2
 terraform plan
 # WARNING: The next command will override ~/.kube/config. Make a backup if needed.
 terraform apply --auto-approve
 ```
-
-### What does 'terraform apply' do?
-
-- Checks if the current dir already contains a file named `coreos.qcow2`
-- If the file is not found, then it downloads the latest version of fcos
-- Converts the zipped image file to qcow2 and moves it to the Proxmox node
-- Creates a template using the qcow2 image
-- Copies your public key `~/.ssh/id_rsa.pub` to the Proxmox node
-- Creates ignition files with the system units and ssh keys injected for each VM to be created
-- Creates nodes using the ignition configurations and other parameters  specified in `terraform.tfvars`
-- Updates the haproxy configuration on a VM/raspberry pi
-- Deploys a k0s cluster when the nodes are ready. The latest version of k0s is used every time.
-- Replaces `~/.kube/config` with the new kubeconfig from k0sctl
-
 
 ## Using HAProxy as a Load Balancer
 
@@ -131,23 +134,17 @@ k create -f ./nginx-example/ingress.yaml
 curl -k https://192.168.0.101
 ```
 
-## Exposing your cluster to the internet with a free subdomain!
+## Exposing your cluster to the internet with a free subdomain! (Optional)
 
-You'll need an account with duckdns - they provide you with a free subdomain that you can use to host your web services from your home internet.
+You'll need an account with duckdns - they provide you with a free subdomain that you can use to host your web services from your home internet. You'll also be needing a VPS in the cloud that can take in your traffic from a public IP address so that you don't expose your own IP address. Oracle provides a [free tier](https://www.oracle.com/in/cloud/free/) account with 4 vcpus and 24GB of memory. I'll be using this to create a VM. To expose the traffic properly, follow [this](https://github.com/Naman1997/simple-fcos-cluster/blob/main/Wireguard_Setup.md) guide.
 
-You'll also be needing a VPS in the cloud that can take in your traffic from a public IP address so that you don't expose your own local IP address.
-
-Oracle provides a [free tier](https://www.oracle.com/in/cloud/free/) account with 4 vcpus and 24GB of memory!
-
-To expose the traffic properly, follow [this](https://github.com/Naman1997/simple-fcos-cluster/blob/main/Wireguard_Setup.md) guide.
-
-For this setup, you'll be installing wireguard on the VPS and your raspberry pi/VM that is running haproxy. The traffic flow is shown in the image below.
+For this setup, we'll be installing wireguard on the VPS and the node that is running haproxy. The traffic flow is shown in the image below.
 
 ![Wireguard_Flow drawio (1) drawio](https://user-images.githubusercontent.com/19908560/210160766-31491844-8ae0-41d9-b31c-7cfe5ee8669a.png)
 
 ## Notes
 
-### Debugging HA Proxy
+### Debugging HAProxy
 
 ```
 haproxy -c -f /etc/haproxy/haproxy.cfg
@@ -155,7 +152,7 @@ haproxy -c -f /etc/haproxy/haproxy.cfg
 
 ### What about libvirt?
 
-There is a branch named ['kvm'](https://github.com/Naman1997/simple-fcos-cluster/tree/kvm) in the repo that has steps to create a similar cluster using the 'dmacvicar/libvirt' provider. I won't be maintaining that branch - but it can be used as a frame of reference for someone who wants to create a Core OS based k8s cluser in their homelab.
+There is a branch named ['kvm'](https://github.com/Naman1997/simple-fcos-cluster/tree/kvm) in the repo that has steps to create a similar cluster using the 'dmacvicar/libvirt' provider. I won't be maintaining that branch - but it can be used as a frame of reference for someone who wants to create a Core OS based k8s cluster in their homelab.
 
 ### Video
 
