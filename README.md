@@ -3,11 +3,10 @@
  [![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/Naman1997/simple-fcos-cluster/blob/main/LICENSE)
 
 A simple kubernetes cluster using Fedora Core OS, Proxmox and k0sctl.
-Documentation for exposing the cluster over wireguard is also provided - however this is a manual step at this point.
 
 ## Dependencies
 
-Here, `Client` refers to the node that will be executing `terraform apply` to create the cluster. The `Raspberry Pi` can be replaced with a VM or a LXC container.
+`Client` refers to the node that will be executing `terraform apply` to create the cluster. The `Raspberry Pi` can be replaced with a VM or a LXC container.
 
 | Dependency | Location |
 | ------ | ------ |
