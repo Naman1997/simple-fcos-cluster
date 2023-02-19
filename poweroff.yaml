@@ -1,0 +1,8 @@
+---
+- hosts: masters:workers 
+  gather_facts: False
+  become: true
+  tasks:
+  - name: Poweroff
+    raw: poweroff
+    ignore_errors: true

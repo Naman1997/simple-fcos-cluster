@@ -87,6 +87,12 @@ For this setup, we'll be installing wireguard on the VPS and the node that is ru
 
 ## Notes
 
+### Poweroff all VMs in the cluster
+
+```
+ansible-playbook -i hosts poweroff.yaml
+```
+
 ### Debugging HAProxy
 
 ```
