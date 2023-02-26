@@ -229,6 +229,13 @@ resource "local_file" "k0sctl_config" {
     }
   )
   filename = "k0sctl.yaml"
+}
+
+resource "null_resource" "setup_cluster" {
+
+  depends_on = [
+    local_file.k0sctl_config
+  ]
 
   provisioner "local-exec" {
     command = <<-EOT
@@ -237,6 +244,7 @@ resource "local_file" "k0sctl_config" {
     EOT
     when    = create
   }
+
 }
 
 resource "local_file" "ansible_hosts" {
