@@ -34,8 +34,8 @@ systemd:
             ExecStart=
             ExecStart=/sbin/fstrim -av
 
-    - name: containerd.service
-      enabled: true
+    # - name: containerd.service
+    #   enabled: true
 storage:
   files:
     - path: /etc/sysctl.d/20-silence-audit.conf

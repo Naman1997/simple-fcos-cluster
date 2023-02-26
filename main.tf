@@ -232,8 +232,8 @@ resource "local_file" "k0sctl_config" {
 
   provisioner "local-exec" {
     command = <<-EOT
-      k0sctl apply --config k0sctl.yaml
-      k0sctl kubeconfig > ~/.kube/config
+      k0sctl apply --config k0sctl.yaml --disable-telemetry
+      k0sctl kubeconfig > ~/.kube/config --disable-telemetry
     EOT
     when    = create
   }
