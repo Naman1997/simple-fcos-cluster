@@ -12,6 +12,7 @@ A simple kubernetes cluster using Fedora Core OS, Proxmox and k0sctl.
 | ------ | ------ |
 | [Proxmox](https://www.proxmox.com/en/proxmox-ve) | Proxmox node |
 | [xz](https://en.wikipedia.org/wiki/XZ_Utils) | Proxmox node & Client |
+| [jq](https://stedolan.github.io/jq/) | Client |
 | [Terraform](https://www.terraform.io/) | Client |
 | [k0sctl](https://github.com/k0sproject/k0sctl) | Client |
 | [HAproxy](http://www.haproxy.org/) | Raspberry Pi |

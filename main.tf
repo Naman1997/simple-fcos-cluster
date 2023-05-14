@@ -2,7 +2,7 @@ terraform {
   required_providers {
     proxmox = {
       source  = "telmate/proxmox"
-      version = "2.9.11"
+      version = "2.9.14"
     }
   }
 }
@@ -240,6 +240,7 @@ resource "null_resource" "setup_cluster" {
   provisioner "local-exec" {
     command = <<-EOT
       k0sctl apply --config k0sctl.yaml --disable-telemetry
+      mkdir -p ~/.kube
       k0sctl kubeconfig > ~/.kube/config --disable-telemetry
     EOT
     when    = create
