@@ -242,6 +242,7 @@ resource "null_resource" "setup_cluster" {
       k0sctl apply --config k0sctl.yaml --disable-telemetry
       mkdir -p ~/.kube
       k0sctl kubeconfig > ~/.kube/config --disable-telemetry
+      chmod 600 ~/.kube/config
     EOT
     when    = create
   }
