@@ -1,26 +1,43 @@
 terraform {
   required_providers {
     proxmox = {
-      source  = "telmate/proxmox"
-      version = "2.9.14"
+      source  = "bpg/proxmox"
+      version = "0.38.1"
     }
   }
 }
 
-resource "proxmox_vm_qemu" "node" {
-  name        = var.name
-  memory      = var.memory
-  cores       = var.vcpus
-  sockets     = var.sockets
-  onboot      = var.autostart
-  target_node = var.target_node
-  agent       = 1
-  clone       = "coreos-golden"
-  full_clone  = true
-  boot        = "order=virtio0;net0"
-  args        = "-fw_cfg name=opt/com.coreos/config,file=/root/ignition/ignition_${var.name}.ign"
+resource "proxmox_virtual_environment_vm" "node" {
+  name                = var.name
+  on_boot             = var.autostart
+  node_name           = var.target_node
+  scsi_hardware       = "virtio-scsi-pci"
+  kvm_arguments       = "-fw_cfg name=opt/com.coreos/config,file=/root/ignition/ignition_${var.name}.ign"
+  timeout_shutdown_vm = 300
+  reboot              = true
 
-  network {
+  memory {
+    dedicated = var.memory
+    floating  = var.memory
+  }
+
+  cpu {
+    cores   = var.vcpus
+    type    = "host"
+    sockets = var.sockets
+  }
+
+  agent {
+    enabled = true
+    timeout = "10s"
+  }
+
+  clone {
+    retries = 3
+    vm_id   = 7000
+  }
+
+  network_device {
     model  = "e1000"
     bridge = var.default_bridge
   }
@@ -41,7 +58,7 @@ resource "proxmox_vm_qemu" "node" {
       done
     EOT
     environment = {
-      ADDRESS = self.ssh_host
+      ADDRESS = element([for addresses in self.ipv4_addresses : addresses[0] if addresses[0] != "127.0.0.1"], 0)
     }
     when = destroy
   }
@@ -63,19 +80,23 @@ resource "proxmox_vm_qemu" "node" {
       done
     EOT
     environment = {
-      ADDRESS = self.ssh_host
+      ADDRESS = element([for addresses in self.ipv4_addresses : addresses[0] if addresses[0] != "127.0.0.1"], 0)
     }
     when = create
   }
 }
 
+locals {
+  non_local_ipv4_address = element([for addresses in proxmox_virtual_environment_vm.node.ipv4_addresses : addresses[0] if addresses[0] != "127.0.0.1"], 0)
+}
+
 resource "null_resource" "wait_for_ssh" {
   depends_on = [
-    proxmox_vm_qemu.node
+    proxmox_virtual_environment_vm.node
   ]
   provisioner "remote-exec" {
     connection {
-      host        = proxmox_vm_qemu.node.ssh_host
+      host        = local.non_local_ipv4_address
       user        = "core"
       private_key = file("~/.ssh/id_rsa")
       timeout     = "5m"

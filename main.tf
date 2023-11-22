@@ -1,17 +1,17 @@
 terraform {
   required_providers {
     proxmox = {
-      source  = "telmate/proxmox"
-      version = "2.9.14"
+      source  = "bpg/proxmox"
+      version = "0.38.1"
     }
   }
 }
 
 provider "proxmox" {
-  pm_api_url      = var.PROXMOX_API_ENDPOINT
-  pm_user         = "${var.PROXMOX_USERNAME}@pam"
-  pm_password     = var.PROXMOX_PASSWORD
-  pm_tls_insecure = true
+  endpoint = var.PROXMOX_API_ENDPOINT
+  username = "${var.PROXMOX_USERNAME}@pam"
+  password = var.PROXMOX_PASSWORD
+  insecure = true
 }
 
 data "external" "versions" {
@@ -176,10 +176,10 @@ resource "local_file" "haproxy_config" {
   content = templatefile("${path.root}/templates/haproxy.tmpl",
     {
       node_map_masters = zipmap(
-        tolist(module.master_domain.*.address), tolist(module.master_domain.*.name)
+        module.master_domain.*.address, module.master_domain.*.name
       ),
       node_map_workers = zipmap(
-        tolist(module.worker_domain.*.address), tolist(module.worker_domain.*.name)
+        module.worker_domain.*.address, module.worker_domain.*.name
       )
     }
   )
