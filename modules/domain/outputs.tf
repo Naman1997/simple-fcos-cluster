@@ -1,9 +1,9 @@
 output "address" {
-  value       = proxmox_vm_qemu.node.ssh_host
-  description = "IP Address of the node"
+  value       = local.non_local_ipv4_address
+  description = "Non-local IP Address of the node"
 }
 
 output "name" {
-  value       = proxmox_vm_qemu.node.name
+  value       = proxmox_virtual_environment_vm.node.name
   description = "Name of the node"
 }
