@@ -1,5 +1,5 @@
 output "address" {
-  value       = element([for addresses in proxmox_virtual_environment_vm.node.ipv4_addresses : addresses[0] if addresses[0] != "127.0.0.1"], 0)
+  value       = element(flatten(proxmox_virtual_environment_vm.node.ipv4_addresses), 1)
   description = "Non-local IP Address of the node"
 }
 

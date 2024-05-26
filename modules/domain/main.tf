@@ -57,7 +57,7 @@ resource "proxmox_virtual_environment_vm" "node" {
       done
     EOT
     environment = {
-      ADDRESS = element([for addresses in self.ipv4_addresses : addresses[0] if addresses[0] != "127.0.0.1"], 0)
+      ADDRESS = element(flatten(self.ipv4_addresses), 1)
     }
     when = destroy
   }
@@ -79,7 +79,7 @@ resource "proxmox_virtual_environment_vm" "node" {
       done
     EOT
     environment = {
-      ADDRESS = element([for addresses in self.ipv4_addresses : addresses[0] if addresses[0] != "127.0.0.1"], 0)
+      ADDRESS = element(flatten(self.ipv4_addresses), 1)
     }
     when = create
   }
