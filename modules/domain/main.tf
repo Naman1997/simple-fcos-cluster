@@ -8,13 +8,11 @@ terraform {
 }
 
 resource "proxmox_virtual_environment_vm" "node" {
-  name                = var.name
-  on_boot             = var.autostart
-  node_name           = var.target_node
-  scsi_hardware       = "virtio-scsi-pci"
-  kvm_arguments       = "-fw_cfg name=opt/com.coreos/config,file=/root/ignition/ignition_${var.name}.ign"
-  timeout_shutdown_vm = 300
-  reboot              = true
+  name          = var.name
+  on_boot       = var.autostart
+  node_name     = var.target_node
+  scsi_hardware = "virtio-scsi-pci"
+  kvm_arguments = "-fw_cfg name=opt/com.coreos/config,file=/root/ignition/ignition_${var.name}.ign"
 
   memory {
     dedicated = var.memory
@@ -29,7 +27,7 @@ resource "proxmox_virtual_environment_vm" "node" {
 
   agent {
     enabled = true
-    timeout = "60s"
+    timeout = "120s"
   }
 
   clone {
@@ -84,28 +82,5 @@ resource "proxmox_virtual_environment_vm" "node" {
       ADDRESS = element([for addresses in self.ipv4_addresses : addresses[0] if addresses[0] != "127.0.0.1"], 0)
     }
     when = create
-  }
-}
-
-locals {
-  non_local_ipv4_address = element([for addresses in proxmox_virtual_environment_vm.node.ipv4_addresses : addresses[0] if addresses[0] != "127.0.0.1"], 0)
-}
-
-resource "null_resource" "wait_for_ssh" {
-  depends_on = [
-    proxmox_virtual_environment_vm.node
-  ]
-  provisioner "remote-exec" {
-    connection {
-      host        = local.non_local_ipv4_address
-      user        = "core"
-      private_key = file("~/.ssh/id_rsa")
-      timeout     = "5m"
-    }
-
-    inline = [
-      "# Connected!",
-      "echo Connected to `hostname`"
-    ]
   }
 }
