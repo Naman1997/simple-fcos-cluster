@@ -8,11 +8,11 @@ terraform {
 }
 
 resource "proxmox_virtual_environment_vm" "node" {
-  name                = var.name
-  on_boot             = var.autostart
-  node_name           = var.target_node
-  scsi_hardware       = "virtio-scsi-pci"
-  kvm_arguments       = "-fw_cfg name=opt/com.coreos/config,file=/root/ignition/ignition_${var.name}.ign"
+  name          = var.name
+  on_boot       = var.autostart
+  node_name     = var.target_node
+  scsi_hardware = "virtio-scsi-pci"
+  kvm_arguments = "-fw_cfg name=opt/com.coreos/config,file=/root/ignition/ignition_${var.name}.ign"
 
   memory {
     dedicated = var.memory
