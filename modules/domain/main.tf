@@ -2,7 +2,7 @@ terraform {
   required_providers {
     proxmox = {
       source  = "bpg/proxmox"
-      version = "0.43.2"
+      version = "0.57.1"
     }
   }
 }
@@ -29,7 +29,7 @@ resource "proxmox_virtual_environment_vm" "node" {
 
   agent {
     enabled = true
-    timeout = "10s"
+    timeout = "60s"
   }
 
   clone {
@@ -39,7 +39,7 @@ resource "proxmox_virtual_environment_vm" "node" {
   }
 
   network_device {
-    model  = "e1000"
+    model  = "virtio"
     bridge = var.default_bridge
   }
 
