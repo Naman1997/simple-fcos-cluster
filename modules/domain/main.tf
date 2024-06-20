@@ -2,7 +2,7 @@ terraform {
   required_providers {
     proxmox = {
       source  = "bpg/proxmox"
-      version = "0.57.1"
+      version = "0.60.0"
     }
   }
 }
@@ -27,7 +27,7 @@ resource "proxmox_virtual_environment_vm" "node" {
 
   agent {
     enabled = true
-    timeout = "120s"
+    timeout = "600s"
   }
 
   clone {
