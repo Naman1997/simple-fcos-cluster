@@ -2,7 +2,7 @@ terraform {
   required_providers {
     proxmox = {
       source  = "bpg/proxmox"
-      version = "0.57.1"
+      version = "0.61.1"
     }
   }
 }
@@ -21,9 +21,10 @@ data "external" "versions" {
 }
 
 locals {
-  fcos_version = data.external.versions.result["fcos_version"]
-  k0s_version  = data.external.versions.result["k0s_version"]
-  iso_url      = "https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/${local.fcos_version}/x86_64/fedora-coreos-${local.fcos_version}-qemu.x86_64.qcow2.xz"
+  ha_proxy_user = "ubuntu"
+  fcos_version  = data.external.versions.result["fcos_version"]
+  k0s_version   = data.external.versions.result["k0s_version"]
+  iso_url       = "https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/${local.fcos_version}/x86_64/fedora-coreos-${local.fcos_version}-qemu.x86_64.qcow2.xz"
 }
 
 resource "null_resource" "download_fcos_image" {
@@ -165,12 +166,20 @@ module "worker_domain" {
   target_node    = var.TARGET_NODE
 }
 
+module "proxy" {
+  source         = "./modules/proxy"
+  ha_proxy_user  = local.ha_proxy_user
+  DEFAULT_BRIDGE = var.DEFAULT_BRIDGE
+  TARGET_NODE    = var.TARGET_NODE
+}
+
 
 resource "local_file" "haproxy_config" {
 
   depends_on = [
     module.master_domain.node,
-    module.worker_domain.node
+    module.worker_domain.node,
+    module.proxy.node
   ]
 
   content = templatefile("${path.root}/templates/haproxy.tmpl",
@@ -190,16 +199,16 @@ resource "local_file" "haproxy_config" {
     destination = "/etc/haproxy/haproxy.cfg"
     connection {
       type        = "ssh"
-      host        = var.ha_proxy_server
-      user        = var.ha_proxy_user
+      host        = module.proxy.proxy_ipv4_address
+      user        = local.ha_proxy_user
       private_key = file("~/.ssh/id_rsa")
     }
   }
 
   provisioner "remote-exec" {
     connection {
-      host        = var.ha_proxy_server
-      user        = var.ha_proxy_user
+      host        = module.proxy.proxy_ipv4_address
+      user        = local.ha_proxy_user
       private_key = file("~/.ssh/id_rsa")
     }
 
@@ -225,7 +234,7 @@ resource "local_file" "k0sctl_config" {
       ),
       "user"        = "core",
       "k0s_version" = local.k0s_version,
-      "ha_proxy_server" : var.ha_proxy_server
+      "ha_proxy_server" : module.proxy.proxy_ipv4_address
     }
   )
   filename = "k0sctl.yaml"
@@ -239,7 +248,22 @@ resource "null_resource" "setup_cluster" {
 
   provisioner "local-exec" {
     command = <<-EOT
-      k0sctl apply --config k0sctl.yaml --disable-telemetry
+      MAX_RETRIES=5
+      RETRY_INTERVAL=10
+      for ((i = 1; i <= MAX_RETRIES; i++)); do
+        k0sctl apply --config k0sctl.yaml --disable-telemetry
+        code=$?
+        if [ $code -eq 0 ]; then
+          break
+        fi
+        if [ $i -lt $MAX_RETRIES ]; then
+          echo "Unable to apply config. Retrying in 10 seconds..."
+          sleep $RETRY_INTERVAL
+        else
+          echo "Maximum retries reached. Unable to apply config."
+          exit 1
+        fi
+      done
       mkdir -p ~/.kube
       k0sctl kubeconfig > ~/.kube/config --disable-telemetry
       chmod 600 ~/.kube/config

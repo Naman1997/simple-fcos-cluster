@@ -70,14 +70,3 @@ variable "worker_config" {
     sockets = number
   })
 }
-
-# HA Proxy config
-variable "ha_proxy_server" {
-  description = "IP address of server running haproxy"
-  type        = string
-}
-
-variable "ha_proxy_user" {
-  description = "User on ha_proxy_server that can modify '/etc/haproxy/haproxy.cfg' and restart haproxy.service"
-  type        = string
-}

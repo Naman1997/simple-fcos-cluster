@@ -6,7 +6,7 @@ A simple kubernetes cluster using Fedora Core OS, Proxmox and k0sctl.
 
 ## Dependencies
 
-`Client` refers to the node that will be executing `terraform apply` to create the cluster. The `Raspberry Pi` can be replaced with a VM or a LXC container. The items marked `Optional` are needed only when you want to expose your kubernetes services to the internet via WireGuard.
+`Client` refers to the node that will be executing `terraform apply` to create the cluster.
 
 | Dependency | Location |
 | ------ | ------ |
@@ -15,9 +15,6 @@ A simple kubernetes cluster using Fedora Core OS, Proxmox and k0sctl.
 | [jq](https://stedolan.github.io/jq/) | Client |
 | [Terraform](https://www.terraform.io/) | Client |
 | [k0sctl](https://github.com/k0sproject/k0sctl) | Client |
-| [HAproxy](http://www.haproxy.org/) | Raspberry Pi |
-| [Wireguard](https://www.wireguard.com/) (Optional) | Raspberry Pi & Cloud VPS |
-| [Docker](https://docs.docker.com/) (Optional) | Cloud VPS |
 
 ## One-time Configuration
 
@@ -30,12 +27,6 @@ git clone https://github.com/Naman1997/simple-fcos-cluster.git
 cd simple-fcos-cluster/scripts
 chmod +x ./versions.sh
 ```
-
-### Create an HA Proxy Server
-
-I've installed `haproxy` on my Raspberry Pi. You can choose to do the same in a LXC container or a VM.
-
-You need to have passwordless SSH access to a user (from the Client node) in this node which has the permissions to modify the file `/etc/haproxy/haproxy.cfg` and permissions to run `sudo systemctl restart haproxy`. An example is covered in this [doc](https://github.com/Naman1997/simple-fcos-cluster/blob/main/docs/HA_Proxy.md).
 
 
 ### Create the terraform.tfvars file
