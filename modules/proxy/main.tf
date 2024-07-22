@@ -2,7 +2,7 @@ terraform {
   required_providers {
     proxmox = {
       source  = "bpg/proxmox"
-      version = "0.60.0"
+      version = "0.61.1"
     }
   }
 }
@@ -118,7 +118,7 @@ resource "proxmox_virtual_environment_vm" "node" {
       do
         echo "Attempt number: $n"
         ssh-keyscan -H $ADDRESS >> ~/.ssh/known_hosts
-        ssh -q -o StrictHostKeyChecking=no core@$ADDRESS exit < /dev/null
+        ssh -q -o StrictHostKeyChecking=no ubuntu@$ADDRESS exit < /dev/null
         if [ $? -eq 0 ]; then
           echo "Successfully added $ADDRESS"
           break

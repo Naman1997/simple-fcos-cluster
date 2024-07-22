@@ -2,7 +2,7 @@ terraform {
   required_providers {
     proxmox = {
       source  = "bpg/proxmox"
-      version = "0.60.0"
+      version = "0.61.1"
     }
   }
 }
@@ -248,7 +248,22 @@ resource "null_resource" "setup_cluster" {
 
   provisioner "local-exec" {
     command = <<-EOT
-      k0sctl apply --config k0sctl.yaml --disable-telemetry
+      MAX_RETRIES=5
+      RETRY_INTERVAL=10
+      for ((i = 1; i <= MAX_RETRIES; i++)); do
+        k0sctl apply --config k0sctl.yaml --disable-telemetry
+        code=$?
+        if [ $code -eq 0 ]; then
+          break
+        fi
+        if [ $i -lt $MAX_RETRIES ]; then
+          echo "Unable to apply config. Retrying in 10 seconds..."
+          sleep $RETRY_INTERVAL
+        else
+          echo "Maximum retries reached. Unable to apply config."
+          exit 1
+        fi
+      done
       mkdir -p ~/.kube
       k0sctl kubeconfig > ~/.kube/config --disable-telemetry
       chmod 600 ~/.kube/config
