@@ -29,8 +29,8 @@ resource "proxmox_virtual_environment_file" "cloud_config" {
           - ${trimspace(data.local_file.ssh_public_key.content)}
         sudo: ALL=(ALL) NOPASSWD:ALL
     runcmd:
-        - apt update
-        - apt install -y qemu-guest-agent haproxy net-tools
+        - apt update -y && apt dist-upgrade -y
+        - apt install -y qemu-guest-agent haproxy net-tools unattended-upgrades
         - timedatectl set-timezone America/Toronto
         - systemctl enable qemu-guest-agent
         - systemctl enable --now haproxy
