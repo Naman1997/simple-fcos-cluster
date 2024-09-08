@@ -12,3 +12,7 @@ variable "TARGET_NODE" {
   description = "Target node name in proxmox"
   type        = string
 }
+
+variable "ssh_key" {
+  description = "Public SSH key to be authorized"
+}

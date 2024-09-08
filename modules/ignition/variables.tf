@@ -17,3 +17,7 @@ variable "proxmox_password" {
   description = "Password used to login proxmox"
   type        = string
 }
+
+variable "ssh_key" {
+  description = "Public SSH key to be authorized"
+}

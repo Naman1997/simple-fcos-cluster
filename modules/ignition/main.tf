@@ -12,7 +12,7 @@ data "template_file" "config" {
   template = file("${path.module}/system-units/template.yaml")
   vars = {
     domain_name        = var.name
-    ssh_authorized_key = file("~/.ssh/id_rsa.pub")
+    ssh_authorized_key = file(pathexpand(var.ssh_key))
   }
 }
 
