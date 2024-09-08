@@ -46,7 +46,7 @@ resource "null_resource" "copy_qcow2_image" {
     connection {
       host        = var.PROXMOX_IP
       user        = var.PROXMOX_USERNAME
-      private_key = file("~/.ssh/id_rsa")
+      private_key = file(var.PROXMOX_SSH_KEY)
     }
 
     inline = [
@@ -64,7 +64,7 @@ resource "null_resource" "copy_qcow2_image" {
       type        = "ssh"
       host        = var.PROXMOX_IP
       user        = var.PROXMOX_USERNAME
-      private_key = file("~/.ssh/id_rsa")
+      private_key = file(var.PROXMOX_SSH_KEY)
     }
   }
 }
@@ -74,13 +74,13 @@ resource "null_resource" "copy_ssh_keys" {
     null_resource.copy_qcow2_image
   ]
   provisioner "file" {
-    source      = "~/.ssh/id_rsa.pub"
+    source      = join("", [var.PROXMOX_SSH_KEY, ".pub"])
     destination = "/root/fcos-cluster/id_rsa.pub"
     connection {
       type        = "ssh"
       host        = var.PROXMOX_IP
       user        = var.PROXMOX_USERNAME
-      private_key = file("~/.ssh/id_rsa")
+      private_key = file(var.PROXMOX_SSH_KEY)
     }
   }
 }
@@ -94,7 +94,7 @@ resource "null_resource" "create_template" {
     connection {
       host        = var.PROXMOX_IP
       user        = var.PROXMOX_USERNAME
-      private_key = file("~/.ssh/id_rsa")
+      private_key = file(var.PROXMOX_SSH_KEY)
     }
 
     script = "${path.root}/scripts/template.sh"
@@ -117,6 +117,7 @@ module "master-ignition" {
   proxmox_user     = var.PROXMOX_USERNAME
   proxmox_password = var.PROXMOX_PASSWORD
   proxmox_host     = var.PROXMOX_IP
+  ssh_key          = join("", [var.PROXMOX_SSH_KEY, ".pub"])
   count            = var.MASTER_COUNT
 }
 
@@ -129,6 +130,7 @@ module "worker-ignition" {
   proxmox_user     = var.PROXMOX_USERNAME
   proxmox_password = var.PROXMOX_PASSWORD
   proxmox_host     = var.PROXMOX_IP
+  ssh_key          = join("", [var.PROXMOX_SSH_KEY, ".pub"])
   count            = var.WORKER_COUNT
 }
 
@@ -171,6 +173,7 @@ module "proxy" {
   ha_proxy_user  = local.ha_proxy_user
   DEFAULT_BRIDGE = var.DEFAULT_BRIDGE
   TARGET_NODE    = var.TARGET_NODE
+  ssh_key        = join("", [var.PROXMOX_SSH_KEY, ".pub"])
 }
 
 
@@ -201,7 +204,7 @@ resource "local_file" "haproxy_config" {
       type        = "ssh"
       host        = module.proxy.proxy_ipv4_address
       user        = local.ha_proxy_user
-      private_key = file("~/.ssh/id_rsa")
+      private_key = file(var.PROXMOX_SSH_KEY)
     }
   }
 
@@ -209,7 +212,7 @@ resource "local_file" "haproxy_config" {
     connection {
       host        = module.proxy.proxy_ipv4_address
       user        = local.ha_proxy_user
-      private_key = file("~/.ssh/id_rsa")
+      private_key = file(var.PROXMOX_SSH_KEY)
     }
 
     inline = [
@@ -232,9 +235,10 @@ resource "local_file" "k0sctl_config" {
       node_map_workers = zipmap(
         tolist(module.worker_domain.*.address), tolist(module.worker_domain.*.name)
       ),
-      "user"        = "core",
-      "k0s_version" = local.k0s_version,
-      "ha_proxy_server" : module.proxy.proxy_ipv4_address
+      "user"            = "core",
+      "k0s_version"     = local.k0s_version,
+      "ha_proxy_server" = module.proxy.proxy_ipv4_address,
+      "ssh_key"         = var.PROXMOX_SSH_KEY
     }
   )
   filename = "k0sctl.yaml"

@@ -19,6 +19,11 @@ variable "PROXMOX_IP" {
   type        = string
 }
 
+variable "PROXMOX_SSH_KEY" {
+  description = "SSH key for proxmox host"
+  type        = string
+}
+
 variable "DEFAULT_BRIDGE" {
   description = "Bridge to use when creating VMs in proxmox"
   type        = string

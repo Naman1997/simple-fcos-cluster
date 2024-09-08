@@ -9,14 +9,14 @@ spec:
     ssh:
       address: ${node_host}
       user: ${user}
-      keyPath: ~/.ssh/id_rsa
+      keyPath: ${ssh_key}
 %{endfor}
 %{ for node_host, node_hostname in node_map_workers ~}
   - role: worker
     ssh:
       address: ${node_host}
       user: ${user}
-      keyPath: ~/.ssh/id_rsa
+      keyPath: ${ssh_key}
 %{endfor}
   k0s:
     version: ${k0s_version}

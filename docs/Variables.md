@@ -6,6 +6,7 @@
 | PROXMOX_USERNAME | User name used to login proxmox |
 | PROXMOX_PASSWORD | Password used to login proxmox |
 | PROXMOX_IP | IP address for proxmox |
+| PROXMOX_SSH_KEY | Path to private SSH key used to ssh into proxmox |
 | DEFAULT_BRIDGE | Bridge to use when creating VMs in proxmox |
 | TARGET_NODE | Target node name in proxmox |
 | MASTER_COUNT | Number of masters to create (Should be an odd number) |
