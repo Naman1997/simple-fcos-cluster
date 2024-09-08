@@ -52,7 +52,7 @@ terraform plan
 terraform apply --auto-approve
 ```
 
-## Expose your cluster to the internet (Optional)
+## Expose your cluster to the internet using an Ingress (Optional)
 
 It is possible to expose your cluster to the internet over a small vps even if both your vps and your public ips are dynamic. This is possible by setting up dynamic dns for both your internal network and the vps using something like duckdns
 and a docker container to regularly monitor the IP addresses on both ends. A connection can be then made using wireguard to traverse the network between these 2 nodes. This way you can hide your public IP while exposing services to the internet.
