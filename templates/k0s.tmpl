@@ -6,14 +6,14 @@ spec:
   hosts:
 %{ for node_host, node_hostname in node_map_masters ~}
   - role: controller
-    ssh:
+    openSSH:
       address: ${node_host}
       user: ${user}
       keyPath: ${ssh_key}
 %{endfor}
 %{ for node_host, node_hostname in node_map_workers ~}
   - role: worker
-    ssh:
+    openSSH:
       address: ${node_host}
       user: ${user}
       keyPath: ${ssh_key}
