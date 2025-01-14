@@ -11,12 +11,12 @@ terraform {
 data "ct_config" "ignition" {
   content = templatefile(
     "${path.module}/system-units/template.yaml",
-      {
-        domain_name = var.name,
-        ssh_authorized_key = file(pathexpand(var.ssh_key))
-      }
-    )
-  strict  = true
+    {
+      domain_name        = var.name,
+      ssh_authorized_key = file(pathexpand(var.ssh_key))
+    }
+  )
+  strict = true
 }
 
 # Send Ignition file to Proxmox server
