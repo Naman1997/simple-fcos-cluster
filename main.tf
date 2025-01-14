@@ -2,7 +2,7 @@ terraform {
   required_providers {
     proxmox = {
       source  = "bpg/proxmox"
-      version = "0.66.3"
+      version = "0.69.1"
     }
   }
 }
@@ -255,7 +255,7 @@ resource "null_resource" "setup_cluster" {
       MAX_RETRIES=5
       RETRY_INTERVAL=10
       for ((i = 1; i <= MAX_RETRIES; i++)); do
-        k0sctl apply --config k0sctl.yaml --disable-telemetry
+        k0sctl apply --config k0sctl.yaml
         code=$?
         if [ $code -eq 0 ]; then
           break
@@ -269,7 +269,7 @@ resource "null_resource" "setup_cluster" {
         fi
       done
       mkdir -p ~/.kube
-      k0sctl kubeconfig > ~/.kube/config --disable-telemetry
+      k0sctl kubeconfig > ~/.kube/config
       chmod 600 ~/.kube/config
     EOT
     when    = create

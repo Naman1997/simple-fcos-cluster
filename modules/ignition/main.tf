@@ -2,24 +2,21 @@ terraform {
   required_providers {
     ct = {
       source  = "poseidon/ct"
-      version = "~> 0.13"
+      version = " 0.13.0"
     }
-  }
-}
-
-# Butane config
-data "template_file" "config" {
-  template = file("${path.module}/system-units/template.yaml")
-  vars = {
-    domain_name        = var.name
-    ssh_authorized_key = file(pathexpand(var.ssh_key))
   }
 }
 
 # Worker config converted to Ignition
 data "ct_config" "ignition" {
-  content = data.template_file.config.*.rendered[0]
-  strict  = true
+  content = templatefile(
+    "${path.module}/system-units/template.yaml",
+    {
+      domain_name        = var.name,
+      ssh_authorized_key = file(pathexpand(var.ssh_key))
+    }
+  )
+  strict = true
 }
 
 # Send Ignition file to Proxmox server
