@@ -1,4 +1,5 @@
 # Hypervisor config
+# Make sure `ssh PROXMOX_USERNAME@<PROXMOX_IP> -i <PROXMOX_SSH_KEY>` works
 PROXMOX_API_ENDPOINT = "https://192.168.0.103:8006/api2/json"
 PROXMOX_USERNAME     = "root"
 PROXMOX_PASSWORD     = "password"
