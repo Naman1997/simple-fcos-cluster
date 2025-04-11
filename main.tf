@@ -2,7 +2,7 @@ terraform {
   required_providers {
     proxmox = {
       source  = "bpg/proxmox"
-      version = "0.69.1"
+      version = "0.75.0"
     }
   }
 }
@@ -291,8 +291,12 @@ resource "local_file" "ansible_hosts" {
       node_map_workers = zipmap(
         tolist(module.worker_domain.*.address), tolist(module.worker_domain.*.name)
       ),
+      node_map_proxy = zipmap(
+        [module.proxy.proxy_ipv4_address], ["haproxy"]
+      ),
       "ansible_port" = 22,
-      "ansible_user" = "core"
+      "fcos_user"    = "core",
+      "proxy_user"   = "ubuntu"
     }
   )
   filename = "hosts"

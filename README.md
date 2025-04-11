@@ -6,14 +6,14 @@ A simple kubernetes cluster using Fedora Core OS, Proxmox and k0sctl.
 
 ## Dependencies
 
-`Client` refers to the node that will be executing `terraform apply` to create the cluster.
+`Client` refers to the node that will be executing `tofu apply` to create the cluster.
 
 | Dependency | Location |
 | ------ | ------ |
 | [Proxmox](https://www.proxmox.com/en/proxmox-ve) | Proxmox node |
 | [xz](https://en.wikipedia.org/wiki/XZ_Utils) | Proxmox node & Client |
 | [jq](https://stedolan.github.io/jq/) | Client |
-| [Terraform](https://www.terraform.io/) | Client |
+| [OpenTofu](https://opentofu.org/) | Client |
 | [k0sctl](https://github.com/k0sproject/k0sctl) | Client |
 
 
@@ -36,13 +36,13 @@ In the proxmox web portal, go to `Datacenter` > `Storage` > Click on `local` > `
 ## Creating the cluster
 
 ```
-terraform init -upgrade
+tofu init -upgrade
 # You don't need to run the next command if you're using this repo for the 1st time
 # Only do this if you don't want to reuse the older coreos image existing in the current dir
 rm coreos.qcow2
-terraform plan
+tofu plan
 # WARNING: The next command will override ~/.kube/config. Make a backup if needed.
-terraform apply --auto-approve
+tofu apply --auto-approve
 ```
 
 The created VMs will reboot twice before `qemu-guest-agent` is able to detect their IP addresses. This can take anywhere from 2-5 mins depending on your hardware.
