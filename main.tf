@@ -295,8 +295,8 @@ resource "local_file" "ansible_hosts" {
         [module.proxy.proxy_ipv4_address], ["haproxy"]
       ),
       "ansible_port" = 22,
-      "fcos_user" = "core",
-      "proxy_user" = "ubuntu"
+      "fcos_user"    = "core",
+      "proxy_user"   = "ubuntu"
     }
   )
   filename = "hosts"
